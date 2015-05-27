@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">QikPic</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="login">login</string>
+    <string name="prompt_password">password</string>
+    <string name="prompt_username">username</string>
+    <string name="error_intro">error intro</string>
+    <string name="error_blank_username">blank username</string>
+    <string name="error_join">error join</string>
+    <string name="error_blank_password">blank password</string>
+    <string name="error_end">error end</string>
+    <string name="progress_login">progress login</string>
+    <string name="title_activity_dispatch">DispatchActivity</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="signup">signup</string>
+    <string name="prompt_password_again">password</string>
+    <string name="progress_signup">progress sign up</string>
+    <string name="error_mismatched_passwords">mismatch password</string>
+
+</resources>
