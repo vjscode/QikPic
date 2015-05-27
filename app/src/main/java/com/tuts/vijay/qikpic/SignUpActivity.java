@@ -30,9 +30,6 @@ public class SignUpActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Parse.initialize(this, "omNT20gmamXM11mTtdIFpYnSiKyLbZPaIMxFzqDI",
-                "6Z8MfHJLE4UKhnPxkoiZYMXDqoMCVehkJi375Nut");
-
         setContentView(R.layout.activity_sign_up);
 
         // Set up the signup form.

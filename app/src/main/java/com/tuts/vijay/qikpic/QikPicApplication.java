@@ -11,10 +11,11 @@ public class QikPicApplication extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        initializeParse();
+    }
 
-        //ParseObject.registerSubclass(ParseUser.class);
-
-                //Parse.initialize(this, "omNT20gmamXM11mTtdIFpYnSiKyLbZPaIMxFzqDI",
-                  //      "6Z8MfHJLE4UKhnPxkoiZYMXDqoMCVehkJi375Nut");
+    private void initializeParse() {
+        Parse.initialize(this, "omNT20gmamXM11mTtdIFpYnSiKyLbZPaIMxFzqDI",
+                "6Z8MfHJLE4UKhnPxkoiZYMXDqoMCVehkJi375Nut");
     }
 }
