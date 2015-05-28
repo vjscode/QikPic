@@ -21,12 +21,10 @@ public class DispatchActivity extends Activity {
         // Check if there is current user info
         if (ParseUser.getCurrentUser() != null) {
             // Start an intent for the logged in activity
-            //startActivity(new Intent(this, MainActivity.class));
-            Toast.makeText(this, "log in", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, FeedActivity.class));
         } else {
             // Start and intent for the logged out activity
-            //startActivity(new Intent(this, WelcomeActivity.class));
-            Toast.makeText(this, "log out", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, NewUserActivity.class));
         }
     }
 

@@ -19,5 +19,8 @@
     <string name="prompt_password_again">password</string>
     <string name="progress_signup">progress sign up</string>
     <string name="error_mismatched_passwords">mismatch password</string>
+    <string name="title_activity_new_user">NewUserActivity</string>
+    <string name="caption">QikPic</string>
+    <string name="title_activity_feed">FeedActivity</string>
 
 </resources>
