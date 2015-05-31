@@ -131,10 +131,10 @@ public class FeedActivity extends Activity implements View.OnClickListener {
 
     private ParseFile getParseFileFromBitmap(Bitmap bmp) {
         ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 0 /* ignored for PNG */,blob);
+        bmp.compress(Bitmap.CompressFormat.JPEG, 50 /* ignored for PNG */,blob);
         byte[] imgArray = blob.toByteArray();
         //Assign Byte array to ParseFile
-        ParseFile parseImagefile = new ParseFile("profile_pic.png", imgArray);
+        ParseFile parseImagefile = new ParseFile("profile_pic.jpg", imgArray);
         return parseImagefile;
     }
 }
