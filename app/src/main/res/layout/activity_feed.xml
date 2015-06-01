@@ -15,4 +15,10 @@
         android:id="@+id/capture"
         android:layout_gravity="center"/>
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/capture"
+        android:id="@+id/listView"/>
+
 </RelativeLayout>

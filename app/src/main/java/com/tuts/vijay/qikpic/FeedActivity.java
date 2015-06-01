@@ -13,13 +13,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,6 +36,7 @@ public class FeedActivity extends Activity implements View.OnClickListener {
 
     private static final int TAKE_PHOTO = 0;
     ImageView captureBtn;
+    ListView list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +44,16 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_feed);
         captureBtn = (ImageView) findViewById(R.id.capture);
         captureBtn.setOnClickListener(this);
+        ParseQueryAdapter<ParseObject> adapter = createParseAdapter();
+        list = (ListView) findViewById(R.id.listView);
+        list.setAdapter(adapter);
     }
 
+    private ParseQueryAdapter createParseAdapter() {
+        ParseQueryAdapter<ParseObject> adapter = new QikPicParseQueryAdapter(this, "QikPik");//ParseQueryAdapter<ParseObject>(this, "QikPik");
+        //adapter.setImageKey("image");
+        return adapter;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -137,4 +149,6 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         ParseFile parseImagefile = new ParseFile("profile_pic.jpg", imgArray);
         return parseImagefile;
     }
+
+
 }
