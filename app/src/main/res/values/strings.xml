@@ -3,7 +3,7 @@
 
     <string name="app_name">QikPic</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
     <string name="login">login</string>
     <string name="prompt_password">password</string>
     <string name="prompt_username">username</string>
