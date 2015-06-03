@@ -25,24 +25,29 @@ public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
     public View getItemView(ParseObject object, View v, ViewGroup parent) {
         if (v == null) {
             v = View.inflate(getContext(), R.layout.adapter_list_item, null);
+            ViewHolder holder = new ViewHolder();
+            holder.img = (ParseImageView) v.findViewById(R.id.image);
+            v.setTag(holder);
         }
 
-        // Take advantage of ParseQueryAdapter's getItemView logic for
-        // populating the main TextView/ImageView.
-        // The IDs in your custom layout must match what ParseQueryAdapter expects
-        // if it will be populating a TextView or ImageView for you.
         super.getItemView(object, v, parent);
 
-        // Do additional configuration before returning the View.
-        final ParseImageView pic = (ParseImageView) v.findViewById(R.id.image);
+
+        ViewHolder h = (ViewHolder) v.getTag();
+
+        final ParseImageView pic = h.img;
         pic.setParseFile(object.getParseFile("image"));
         pic.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         pic.loadInBackground(new GetDataCallback() {
             @Override
             public void done(byte[] data, ParseException e) {
-                //pic.setVisibility(View.VISIBLE);
             }
         });
+        object.pinInBackground();
         return v;
+    }
+
+    static class ViewHolder {
+        ParseImageView img;
     }
 }

@@ -2,7 +2,9 @@ package com.tuts.vijay.qikpic;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -119,8 +121,18 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         Bitmap bmp;
         if (resultCode == RESULT_OK) {
             try {
-                bmp = MediaStore.Images.Media.getBitmap( this.getContentResolver(), mCurrentPhotoUri);
-                prepareAndSaveParseObject(bmp);
+                //bmp = MediaStore.Images.Media.getBitmap( this.getContentResolver(), mCurrentPhotoUri);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 4;
+
+                AssetFileDescriptor fileDescriptor =null;
+                fileDescriptor =
+                        getContentResolver().openAssetFileDescriptor(mCurrentPhotoUri, "r");
+
+                Bitmap actuallyUsableBitmap
+                        = BitmapFactory.decodeFileDescriptor(
+                        fileDescriptor.getFileDescriptor(), null, options);
+                prepareAndSaveParseObject(actuallyUsableBitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -143,7 +155,7 @@ public class FeedActivity extends Activity implements View.OnClickListener {
 
     private ParseFile getParseFileFromBitmap(Bitmap bmp) {
         ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 50 /* ignored for PNG */,blob);
+        bmp.compress(Bitmap.CompressFormat.JPEG, 30 /* ignored for PNG */,blob);
         byte[] imgArray = blob.toByteArray();
         //Assign Byte array to ParseFile
         ParseFile parseImagefile = new ParseFile("profile_pic.jpg", imgArray);
