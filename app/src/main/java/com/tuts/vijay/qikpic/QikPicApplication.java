@@ -17,7 +17,6 @@ public class QikPicApplication extends android.app.Application {
     }
 
     private void initializeParse() {
-        Parse.enableLocalDatastore(this);
         Parse.initialize(this, "omNT20gmamXM11mTtdIFpYnSiKyLbZPaIMxFzqDI",
                 "6Z8MfHJLE4UKhnPxkoiZYMXDqoMCVehkJi375Nut");
 
