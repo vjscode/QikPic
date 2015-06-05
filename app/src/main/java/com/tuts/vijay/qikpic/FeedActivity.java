@@ -38,8 +38,10 @@ import java.util.Date;
 public class FeedActivity extends Activity implements View.OnClickListener {
 
     private static final int TAKE_PHOTO = 0;
-    ImageView captureBtn;
-    ListView list;
+    private ImageView captureBtn;
+    private ListView list;
+    private ParseQueryAdapter<ParseObject> adapter;
+    private static final String TAG = FeedActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +49,7 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_feed);
         captureBtn = (ImageView) findViewById(R.id.capture);
         captureBtn.setOnClickListener(this);
-        ParseQueryAdapter<ParseObject> adapter = createParseAdapter();
+        adapter = createParseAdapter();
         list = (ListView) findViewById(R.id.listView);
         list.setAdapter(adapter);
     }
@@ -160,14 +162,15 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         po.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                Log.d("test", "Success: " + e);
+                Log.d(TAG, "Success saving object: " + e);
+                adapter.loadObjects();
             }
         });
     }
 
     private ParseFile getParseFileFromBitmap(Bitmap bmp) {
         ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 30 /* ignored for PNG */,blob);
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100 /* ignored for PNG */,blob);
         byte[] imgArray = blob.toByteArray();
         //Assign Byte array to ParseFile
         ParseFile parseImagefile = new ParseFile("profile_pic.jpg", imgArray);
