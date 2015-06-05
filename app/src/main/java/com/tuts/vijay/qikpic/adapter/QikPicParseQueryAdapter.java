@@ -12,7 +12,9 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
 
@@ -23,7 +25,13 @@ public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
 
     Context mContext;
     public QikPicParseQueryAdapter(Context context, String className) {
-        super(context, className);
+        super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
+            public ParseQuery create() {
+                ParseQuery query = new ParseQuery("QikPik");
+                query.whereEqualTo("user", ParseUser.getCurrentUser());
+                return query;
+            }
+        });
         mContext = context;
         //Picasso.with(mContext).setIndicatorsEnabled(true);
         //Picasso.with(mContext).setLoggingEnabled(true);
