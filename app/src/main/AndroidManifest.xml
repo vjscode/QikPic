@@ -38,6 +38,10 @@
             android:name=".FeedActivity"
             android:label="@string/title_activity_feed" >
         </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/title_activity_detail" >
+        </activity>
     </application>
 
 </manifest>

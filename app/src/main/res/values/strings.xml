@@ -22,5 +22,6 @@
     <string name="title_activity_new_user">NewUserActivity</string>
     <string name="caption">QikPic</string>
     <string name="title_activity_feed">FeedActivity</string>
+    <string name="title_activity_detail">Detail</string>
 
 </resources>

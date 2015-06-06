@@ -17,6 +17,7 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.views.AspectRatioImageView;
 
 /**
  * Created by vijay on 5/30/15.
@@ -52,8 +53,9 @@ public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
         ViewHolder h = (ViewHolder) v.getTag();
 
         final ParseImageView pic = h.img;
-        pic.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        //pic.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         ParseFile f = object.getParseFile("image");
+        ((AspectRatioImageView)pic).setObjectId(object.getObjectId());
         Picasso.with(mContext).load(f.getUrl()).into(pic);
         return v;
     }

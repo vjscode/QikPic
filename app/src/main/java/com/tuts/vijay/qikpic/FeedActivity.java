@@ -26,6 +26,7 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
+import com.tuts.vijay.qikpic.listeners.ListViewItemClickListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +53,7 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         adapter = createParseAdapter();
         list = (ListView) findViewById(R.id.listView);
         list.setAdapter(adapter);
+        list.setOnItemClickListener(new ListViewItemClickListener(this));
     }
 
     private ParseQueryAdapter createParseAdapter() {
