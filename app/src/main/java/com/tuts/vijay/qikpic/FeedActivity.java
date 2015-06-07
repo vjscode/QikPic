@@ -166,8 +166,13 @@ public class FeedActivity extends Activity implements View.OnClickListener {
             public void done(ParseException e) {
                 Log.d(TAG, "Success saving object: " + e);
                 adapter.loadObjects();
+                removeFileFromDisk();
             }
         });
+    }
+
+    private void removeFileFromDisk() {
+        Log.d("test", "deleted? " + new File(mCurrentPhotoUri.getPath()).delete());
     }
 
     private ParseFile getParseFileFromBitmap(Bitmap bmp) {
