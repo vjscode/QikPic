@@ -1,11 +1,8 @@
-package com.tuts.vijay.qikpic;
+package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.parse.ParseUser;
 

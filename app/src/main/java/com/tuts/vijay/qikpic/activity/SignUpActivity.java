@@ -1,4 +1,4 @@
-package com.tuts.vijay.qikpic;
+package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -12,10 +12,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+import com.tuts.vijay.qikpic.R;
 
 /**
  * Activity which displays a login screen to the user.

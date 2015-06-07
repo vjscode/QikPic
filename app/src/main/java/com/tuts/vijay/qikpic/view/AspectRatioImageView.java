@@ -1,4 +1,4 @@
-package com.tuts.vijay.qikpic.views;
+package com.tuts.vijay.qikpic.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

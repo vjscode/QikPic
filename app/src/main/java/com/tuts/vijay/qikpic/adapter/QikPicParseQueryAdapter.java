@@ -1,14 +1,9 @@
 package com.tuts.vijay.qikpic.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.parse.GetDataCallback;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
@@ -17,7 +12,7 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
-import com.tuts.vijay.qikpic.views.AspectRatioImageView;
+import com.tuts.vijay.qikpic.view.AspectRatioImageView;
 
 /**
  * Created by vijay on 5/30/15.

@@ -1,4 +1,4 @@
-package com.tuts.vijay.qikpic;
+package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
+import com.tuts.vijay.qikpic.R;
 
 /**
  * Activity which displays a registration screen to the user.

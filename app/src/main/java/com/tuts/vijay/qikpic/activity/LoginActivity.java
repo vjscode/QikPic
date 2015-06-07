@@ -1,15 +1,11 @@
-package com.tuts.vijay.qikpic;
+package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -21,6 +17,7 @@ import android.widget.Toast;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.tuts.vijay.qikpic.R;
 
 /**
  * Activity which displays a login screen to the user, offering registration as well.

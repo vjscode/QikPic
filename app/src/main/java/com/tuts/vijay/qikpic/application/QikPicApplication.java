@@ -1,4 +1,4 @@
-package com.tuts.vijay.qikpic;
+package com.tuts.vijay.qikpic.application;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package com.tuts.vijay.qikpic;
+package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -25,8 +24,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
-import com.tuts.vijay.qikpic.listeners.ListViewItemClickListener;
+import com.tuts.vijay.qikpic.listener.ListViewItemClickListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

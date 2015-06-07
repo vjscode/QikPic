@@ -1,13 +1,13 @@
-package com.tuts.vijay.qikpic.listeners;
+package com.tuts.vijay.qikpic.listener;
 
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.tuts.vijay.qikpic.DetailActivity;
+import com.tuts.vijay.qikpic.activity.DetailActivity;
 import com.tuts.vijay.qikpic.R;
-import com.tuts.vijay.qikpic.views.AspectRatioImageView;
+import com.tuts.vijay.qikpic.view.AspectRatioImageView;
 
 /**
  * Created by vijay on 6/5/15.
