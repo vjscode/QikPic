@@ -13,13 +13,33 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"/>
 
-    <ListView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/uiswitcher"
+        android:layout_below="@id/capture"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/grid_icon"
+            android:id="@+id/grid_icon"
+            android:layout_margin="5dp"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/list_icon"
+            android:id="@+id/list_icon"
+            android:layout_margin="5dp"/>
+    </LinearLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/capture"
-        android:id="@+id/listView"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10.0sp"
-        android:layout_marginTop="10dp"/>
+        android:layout_below="@id/uiswitcher"
+        android:layout_marginTop="10dp"
+        android:id="@+id/fragmentContainer">
+
+    </FrameLayout>
 
 </RelativeLayout>

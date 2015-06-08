@@ -1,6 +1,8 @@
 package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
@@ -14,19 +16,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
-import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.tuts.vijay.qikpic.R;
-import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
-import com.tuts.vijay.qikpic.listener.ListViewItemClickListener;
+import com.tuts.vijay.qikpic.fragment.PhotosGridFragment;
+import com.tuts.vijay.qikpic.fragment.PhotosListFragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,30 +36,44 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class FeedActivity extends Activity implements View.OnClickListener {
+public class FeedActivity extends Activity implements View.OnClickListener, PhotosListFragment.OnFragmentInteractionListener {
 
     private static final int TAKE_PHOTO = 0;
-    private ImageView captureBtn;
-    private ListView list;
-    private ParseQueryAdapter<ParseObject> adapter;
     private static final String TAG = FeedActivity.class.getSimpleName();
+
+    //UI
+    private ImageView captureBtn;
+    private ImageView gridIcon;
+    private ImageView listIcon;
+
+    //Fragments
+    PhotosGridFragment gridFragment;
+    PhotosListFragment listFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-        captureBtn = (ImageView) findViewById(R.id.capture);
-        captureBtn.setOnClickListener(this);
-        adapter = createParseAdapter();
-        list = (ListView) findViewById(R.id.listView);
-        list.setAdapter(adapter);
-        list.setOnItemClickListener(new ListViewItemClickListener(this));
+        initUI();
+        initFragment();
     }
 
-    private ParseQueryAdapter createParseAdapter() {
-        ParseQueryAdapter<ParseObject> adapter = new QikPicParseQueryAdapter(this, "QikPik");//ParseQueryAdapter<ParseObject>(this, "QikPik");
-        //adapter.setImageKey("image");
-        return adapter;
+    private void initUI() {
+        gridIcon = (ImageView) findViewById(R.id.grid_icon);
+        gridIcon.setOnClickListener(this);
+        listIcon = (ImageView) findViewById(R.id.list_icon);
+        listIcon.setOnClickListener(this);
+        captureBtn = (ImageView) findViewById(R.id.capture);
+        captureBtn.setOnClickListener(this);
+    }
+
+    private void initFragment() {
+        FragmentManager fm = getFragmentManager();
+
+        FragmentTransaction ft = fm.beginTransaction();
+        gridFragment = new PhotosGridFragment();
+        ft.add(R.id.fragmentContainer, gridFragment);
+        ft.commit();
     }
 
     @Override
@@ -96,6 +110,29 @@ public class FeedActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         if (view.getId() == R.id.capture) {
             startCamera();
+        } else if (view.getId() == R.id.list_icon) {
+            switchPanes(R.id.list_icon);
+        } else if (view.getId() == R.id.grid_icon) {
+            switchPanes(R.id.grid_icon);
+        }
+    }
+
+    private void switchPanes(int id) {
+        FragmentManager fm = getFragmentManager();
+        if (id == R.id.list_icon) {
+            FragmentTransaction ft = fm.beginTransaction();
+            if (listFragment == null) {
+                listFragment = new PhotosListFragment();
+            }
+            ft.replace(R.id.fragmentContainer, listFragment);
+            ft.commit();
+        } else {
+            FragmentTransaction ft = fm.beginTransaction();
+            if (gridFragment == null) {
+                gridFragment = new PhotosGridFragment();
+            }
+            ft.replace(R.id.fragmentContainer, gridFragment);
+            ft.commit();
         }
     }
 
@@ -122,7 +159,6 @@ public class FeedActivity extends Activity implements View.OnClickListener {
                 storageDir      /* directory */
         );
 
-        //mCurrentPhotoPath = "file:" + image.getAbsolutePath();
         mCurrentPhotoUri = Uri.fromFile(image);
     }
 
@@ -137,7 +173,6 @@ public class FeedActivity extends Activity implements View.OnClickListener {
         Bitmap bmp;
         if (resultCode == RESULT_OK) {
             try {
-                //bmp = MediaStore.Images.Media.getBitmap( this.getContentResolver(), mCurrentPhotoUri);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = 4;
 
@@ -165,7 +200,7 @@ public class FeedActivity extends Activity implements View.OnClickListener {
             @Override
             public void done(ParseException e) {
                 Log.d(TAG, "Success saving object: " + e);
-                adapter.loadObjects();
+                //adapter.loadObjects();
                 removeFileFromDisk();
             }
         });
@@ -185,4 +220,8 @@ public class FeedActivity extends Activity implements View.OnClickListener {
     }
 
 
+    @Override
+    public void onFragmentInteraction(String id) {
+
+    }
 }
