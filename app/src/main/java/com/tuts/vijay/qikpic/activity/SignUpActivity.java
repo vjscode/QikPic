@@ -65,10 +65,13 @@ public class SignUpActivity extends Activity {
 
         // Validate the sign up data
         boolean validationError = false;
-        StringBuilder validationErrorMessage = new StringBuilder(getString(R.string.error_intro));
+        StringBuilder validationErrorMessage = new StringBuilder();
         if (username.length() == 0) {
             validationError = true;
             validationErrorMessage.append(getString(R.string.error_blank_username));
+        } else if (!username.contains("@")) {
+            validationError = true;
+            validationErrorMessage.append(getString(R.string.error_valid_email));
         }
         if (password.length() == 0) {
             if (validationError) {
@@ -84,7 +87,6 @@ public class SignUpActivity extends Activity {
             validationError = true;
             validationErrorMessage.append(getString(R.string.error_mismatched_passwords));
         }
-        validationErrorMessage.append(getString(R.string.error_end));
 
         // If there is a validation error, display the error
         if (validationError) {
@@ -102,6 +104,7 @@ public class SignUpActivity extends Activity {
         ParseUser user = new ParseUser();
         user.setUsername(username);
         user.setPassword(password);
+        user.setEmail(username);
 
         // Call the Parse signup method
         user.signUpInBackground(new SignUpCallback() {

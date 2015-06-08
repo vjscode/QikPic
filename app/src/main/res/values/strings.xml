@@ -6,9 +6,10 @@
     <string name="action_logout">Logout</string>
     <string name="login">login</string>
     <string name="prompt_password">password</string>
-    <string name="prompt_username">username</string>
+    <string name="prompt_username">email</string>
     <string name="error_intro">error intro</string>
     <string name="error_blank_username">blank username</string>
+    <string name="error_valid_email">please enter a valid email</string>
     <string name="error_join">error join</string>
     <string name="error_blank_password">blank password</string>
     <string name="error_end">error end</string>
