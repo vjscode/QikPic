@@ -10,6 +10,7 @@ import android.widget.GridView;
 
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
+import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
 import com.tuts.vijay.qikpic.listener.GridViewItemClickListener;
@@ -20,7 +21,7 @@ import com.tuts.vijay.qikpic.listener.GridViewItemClickListener;
  * create an instance of this fragment.
  *
  */
-public class PhotosGridFragment extends Fragment {
+public class PhotosGridFragment extends Fragment implements ActivityInteraction {
 
     private ParseQueryAdapter<ParseObject> mAdapter;
     private GridView mGridView;
@@ -54,5 +55,10 @@ public class PhotosGridFragment extends Fragment {
         mAdapter = new QikPicParseQueryAdapter(getActivity(), "QikPik");//ParseQueryAdapter<ParseObject>(this, "QikPik");
         mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new GridViewItemClickListener(getActivity()));
+    }
+
+    @Override
+    public void loadObjects() {
+        mAdapter.loadObjects();
     }
 }

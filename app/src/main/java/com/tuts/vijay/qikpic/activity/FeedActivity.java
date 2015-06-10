@@ -1,6 +1,7 @@
 package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.fragment.PhotosGridFragment;
 import com.tuts.vijay.qikpic.fragment.PhotosListFragment;
@@ -50,6 +52,8 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     PhotosGridFragment gridFragment;
     PhotosListFragment listFragment;
 
+    Fragment currentFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +78,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         gridFragment = new PhotosGridFragment();
         ft.add(R.id.fragmentContainer, gridFragment);
         ft.commit();
+        currentFragment = gridFragment;
     }
 
     @Override
@@ -126,6 +131,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
             }
             ft.replace(R.id.fragmentContainer, listFragment);
             ft.commit();
+            currentFragment = listFragment;
         } else {
             FragmentTransaction ft = fm.beginTransaction();
             if (gridFragment == null) {
@@ -133,6 +139,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
             }
             ft.replace(R.id.fragmentContainer, gridFragment);
             ft.commit();
+            currentFragment = gridFragment;
         }
     }
 
@@ -171,7 +178,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap bmp;
-        if (resultCode == RESULT_OK) {
+        if (requestCode == TAKE_PHOTO && resultCode == RESULT_OK) {
             try {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = 4;
@@ -184,6 +191,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
                         = BitmapFactory.decodeFileDescriptor(
                         fileDescriptor.getFileDescriptor(), null, options);
                 prepareAndSaveParseObject(actuallyUsableBitmap);
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -201,6 +209,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
             public void done(ParseException e) {
                 Log.d(TAG, "Success saving object: " + e);
                 //adapter.loadObjects();
+                ((ActivityInteraction)currentFragment).loadObjects();
                 removeFileFromDisk();
             }
         });

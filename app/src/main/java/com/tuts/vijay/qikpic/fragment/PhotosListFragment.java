@@ -10,11 +10,12 @@ import android.widget.ListView;
 
 import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
+import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
 import com.tuts.vijay.qikpic.listener.ListViewItemClickListener;
 
-public class PhotosListFragment extends Fragment {
+public class PhotosListFragment extends Fragment implements ActivityInteraction {
 
     private OnFragmentInteractionListener mListener;
     private ParseQueryAdapter<ParseObject> mAdapter;
@@ -88,5 +89,10 @@ public class PhotosListFragment extends Fragment {
         mAdapter = new QikPicParseQueryAdapter(getActivity(), "QikPik");//ParseQueryAdapter<ParseObject>(this, "QikPik");
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewItemClickListener(getActivity()));
+    }
+
+    @Override
+    public void loadObjects() {
+        mAdapter.loadObjects();
     }
 }
