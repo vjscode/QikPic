@@ -192,6 +192,8 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
                         fileDescriptor.getFileDescriptor(), null, options);
                 prepareAndSaveParseObject(actuallyUsableBitmap);
 
+
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -201,18 +203,24 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     }
 
     private void prepareAndSaveParseObject(Bitmap bmp) {
-        ParseObject po = new ParseObject("QikPik");
+        final ParseObject po = new ParseObject("QikPik");
         po.put("user", ParseUser.getCurrentUser());
         po.put("image", getParseFileFromBitmap(bmp));
         po.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 Log.d(TAG, "Success saving object: " + e);
-                //adapter.loadObjects();
                 ((ActivityInteraction)currentFragment).loadObjects();
                 removeFileFromDisk();
+                startActivityForTagging(po.getObjectId());
             }
         });
+    }
+
+    private void startActivityForTagging(String id) {
+        Intent i = new Intent(this, DetailActivity.class);
+        i.putExtra("id", id);
+        startActivity(i);
     }
 
     private void removeFileFromDisk() {
