@@ -32,9 +32,10 @@ import java.util.List;
 public class DetailActivity extends Activity implements View.OnClickListener {
 
     private String id;
-    ParseImageView imageView;
-    LinearLayout tagPanel;
-    ImageView addTagIcon;
+    private ParseImageView imageView;
+    private LinearLayout tagPanel;
+    private ImageView addTagIcon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +70,29 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         if (tagList == null) {
             return;
         }
+        emptyTagPanel();
         for (String tag: tagList) {
-
             LayoutInflater inflater = LayoutInflater.from(this);
             TextView tagView= (TextView) inflater.inflate(R.layout.tag_view, null, false);
             tagView.setText(tag);
             tagPanel.addView(tagView, 1, lp);
         }
+    }
+
+    private void emptyTagPanel() {
+        for (int i = 0; i < tagPanel.getChildCount(); i++) {
+            if (!isViewAnchor(tagPanel.getChildAt(i))) {
+                tagPanel.removeViewAt(i);
+            }
+        }
+    }
+
+    private boolean isViewAnchor(View childAt) {
+        int id = childAt.getId();
+        if (id == R.id.addTagIcon || id == R.id.tagIcon) {
+            return true;
+        }
+        return false;
     }
 
     private void showImage(ParseObject object) {
@@ -125,6 +142,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                tags.add(tag);
                object.put("tags", tags);
                object.saveInBackground();
+               showTags(object);
            }
        });
    }
