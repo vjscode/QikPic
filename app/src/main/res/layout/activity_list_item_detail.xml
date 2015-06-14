@@ -15,11 +15,14 @@
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/tag"/>
+            android:src="@drawable/tag"
+            android:layout_margin="10dp"/>
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/add_icon"/>
+            android:id="@+id/addTagIcon"
+            android:src="@drawable/add_icon"
+            android:layout_margin="10dp"/>
     </LinearLayout>
 
     <com.tuts.vijay.qikpic.view.AspectRatioImageView
