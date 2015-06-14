@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="0dp"
@@ -11,19 +15,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/taggingPanel"
-        android:layout_marginBottom="10dp">
+        android:padding="10dp">
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/tag"
-            android:layout_margin="10dp"
-            android:id="@+id/tagIcon"/>
+            android:id="@+id/tagIcon"
+            android:layout_marginRight="10dp"/>
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:id="@+id/addTagIcon"
             android:src="@drawable/add_icon"
-            android:layout_margin="10dp"/>
+            android:layout_marginLeft="10dp"/>
     </LinearLayout>
 
     <com.tuts.vijay.qikpic.view.AspectRatioImageView
@@ -36,3 +40,4 @@
         android:layout_centerInParent="true"
         android:layout_below="@id/taggingPanel"/>
 </RelativeLayout>
+</ScrollView>

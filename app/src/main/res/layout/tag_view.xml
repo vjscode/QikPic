@@ -5,6 +5,7 @@
     android:background="@drawable/tag_view_bkg"
     android:gravity="center"
     android:layout_gravity="center"
-    android:layout_marginTop="10dp">
+    android:layout_marginRight="5dp"
+    android:layout_marginLeft="5dp">
 
 </TextView>
