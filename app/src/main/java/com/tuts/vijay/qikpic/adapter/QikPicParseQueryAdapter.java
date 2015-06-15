@@ -25,6 +25,7 @@ public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
             public ParseQuery create() {
                 ParseQuery query = new ParseQuery("QikPik");
                 query.whereEqualTo("user", ParseUser.getCurrentUser());
+                query.addDescendingOrder("createdAt");
                 return query;
             }
         });
