@@ -5,14 +5,11 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,18 +18,13 @@ import android.widget.Toast;
 
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.fragment.PhotosGridFragment;
 import com.tuts.vijay.qikpic.fragment.PhotosListFragment;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +33,7 @@ import java.util.Date;
 public class FeedActivity extends Activity implements View.OnClickListener, PhotosListFragment.OnFragmentInteractionListener {
 
     private static final int TAKE_PHOTO = 0;
+    private static final int SHOW_PHOTO = 1;
     private static final String TAG = FeedActivity.class.getSimpleName();
 
     //UI
@@ -179,63 +172,18 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap bmp;
         if (requestCode == TAKE_PHOTO && resultCode == RESULT_OK) {
-            try {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = 4;
-
-                AssetFileDescriptor fileDescriptor =null;
-                fileDescriptor =
-                        getContentResolver().openAssetFileDescriptor(mCurrentPhotoUri, "r");
-
-                Bitmap actuallyUsableBitmap
-                        = BitmapFactory.decodeFileDescriptor(
-                        fileDescriptor.getFileDescriptor(), null, options);
-                prepareAndSaveParseObject(actuallyUsableBitmap);
-
-
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            startActivityForTagging();
+        } else if (requestCode == SHOW_PHOTO && resultCode == RESULT_OK) {
+            ((ActivityInteraction)currentFragment).loadObjects();
         }
     }
 
-    private void prepareAndSaveParseObject(Bitmap bmp) {
-        final ParseObject po = new ParseObject("QikPik");
-        po.put("user", ParseUser.getCurrentUser());
-        po.put("image", getParseFileFromBitmap(bmp));
-        po.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                Log.d(TAG, "Success saving object: " + e);
-                ((ActivityInteraction)currentFragment).loadObjects();
-                removeFileFromDisk();
-                startActivityForTagging(po.getObjectId());
-            }
-        });
-    }
-
-    private void startActivityForTagging(String id) {
+    private void startActivityForTagging() {
         Intent i = new Intent(this, DetailActivity.class);
-        i.putExtra("id", id);
-        startActivity(i);
+        i.putExtra("id", "new");
+        i.putExtra("uri", mCurrentPhotoUri);
+        startActivityForResult(i, SHOW_PHOTO);
     }
-
-    private void removeFileFromDisk() {
-        Log.d("test", "deleted? " + new File(mCurrentPhotoUri.getPath()).delete());
-    }
-
-    private ParseFile getParseFileFromBitmap(Bitmap bmp) {
-        ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100 /* ignored for PNG */,blob);
-        byte[] imgArray = blob.toByteArray();
-        //Assign Byte array to ParseFile
-        ParseFile parseImagefile = new ParseFile("profile_pic.jpg", imgArray);
-        return parseImagefile;
-    }
-
 
     @Override
     public void onFragmentInteraction(String id) {
