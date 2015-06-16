@@ -211,17 +211,42 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
    private void createQikPik() {
        try {
-           BitmapFactory.Options options = new BitmapFactory.Options();
-           options.inSampleSize = 4;
-
-           AssetFileDescriptor fileDescriptor =null;
+           AssetFileDescriptor fileDescriptor = null;
            fileDescriptor =
                    getContentResolver().openAssetFileDescriptor(uri, "r");
 
+           float targetW = imageView.getWidth();
+           float targetH = imageView.getHeight();
+
+           // Get the dimensions of the bitmap
+           BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+           bmOptions.inJustDecodeBounds = true;
+           BitmapFactory.decodeFileDescriptor(
+                   fileDescriptor.getFileDescriptor(), null, bmOptions);
+           float photoW = bmOptions.outWidth;
+           float photoH = bmOptions.outHeight;
+
+           float scale = Math.max(photoW/targetW, photoH/targetH);
+
+           // Determine how much to scale down the image
+           int scaleFactor = (int)Math.ceil((double)scale) * 2;
+
+           // Decode the image file into a Bitmap sized to fill the View
+           bmOptions.inJustDecodeBounds = false;
+           bmOptions.inSampleSize = scaleFactor;
+           bmOptions.inPurgeable = true;
+
            Bitmap actuallyUsableBitmap
-                 = BitmapFactory.decodeFileDescriptor(
-               fileDescriptor.getFileDescriptor(), null, options);
-           prepareAndSaveParseObject(actuallyUsableBitmap);
+                   = BitmapFactory.decodeFileDescriptor(
+                   fileDescriptor.getFileDescriptor(), null, bmOptions);
+
+           bmOptions.inSampleSize = scaleFactor * 2;
+
+           Bitmap thumbnailImage
+                   = BitmapFactory.decodeFileDescriptor(
+                   fileDescriptor.getFileDescriptor(), null, bmOptions);
+
+           prepareAndSaveParseObject(actuallyUsableBitmap, thumbnailImage);
 
        } catch (FileNotFoundException e) {
            e.printStackTrace();
@@ -230,10 +255,11 @@ public class DetailActivity extends Activity implements View.OnClickListener {
        }
    }
 
-    private void prepareAndSaveParseObject(Bitmap bmp) {
+    private void prepareAndSaveParseObject(Bitmap bmp, Bitmap thumbnail) {
         final ParseObject po = new ParseObject("QikPik");
         po.put("user", ParseUser.getCurrentUser());
-        po.put("image", getParseFileFromBitmap(bmp));
+        po.put("image", getParseFileFromBitmap(bmp, "profile_pic.jpg"));
+        po.put("thumbnail", getParseFileFromBitmap(thumbnail, "thumbnail_pic.jpg"));
         if (tempTagList != null) {
             po.put("tags", tempTagList);
         }
@@ -248,12 +274,12 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         });
     }
 
-    private ParseFile getParseFileFromBitmap(Bitmap bmp) {
+    private ParseFile getParseFileFromBitmap(Bitmap bmp, String name) {
         ByteArrayOutputStream blob = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100 /* ignored for PNG */,blob);
         byte[] imgArray = blob.toByteArray();
         //Assign Byte array to ParseFile
-        ParseFile parseImagefile = new ParseFile("profile_pic.jpg", imgArray);
+        ParseFile parseImagefile = new ParseFile(name, imgArray);
         return parseImagefile;
     }
 

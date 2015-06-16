@@ -12,6 +12,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQueryAdapter;
 import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
 import com.tuts.vijay.qikpic.listener.GridViewItemClickListener;
 
@@ -53,6 +54,7 @@ public class PhotosGridFragment extends Fragment implements ActivityInteraction 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mAdapter = new QikPicParseQueryAdapter(getActivity(), "QikPik");//ParseQueryAdapter<ParseObject>(this, "QikPik");
+        ((QikPicParseQueryAdapter)mAdapter).setContainerType(Constants.CONTAINER_GRID);
         mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new GridViewItemClickListener(getActivity()));
     }

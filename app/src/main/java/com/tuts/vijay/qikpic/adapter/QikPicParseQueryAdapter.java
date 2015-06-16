@@ -12,6 +12,7 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.view.AspectRatioImageView;
 
 /**
@@ -19,7 +20,9 @@ import com.tuts.vijay.qikpic.view.AspectRatioImageView;
  */
 public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
 
-    Context mContext;
+    private Context mContext;
+    private int container;
+
     public QikPicParseQueryAdapter(Context context, String className) {
         super(context, new ParseQueryAdapter.QueryFactory<ParseObject>() {
             public ParseQuery create() {
@@ -32,6 +35,10 @@ public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
         mContext = context;
         //Picasso.with(mContext).setIndicatorsEnabled(true);
         //Picasso.with(mContext).setLoggingEnabled(true);
+    }
+
+    public void setContainerType(int container) {
+        this.container = container;
     }
 
     @Override
@@ -50,7 +57,12 @@ public class QikPicParseQueryAdapter extends ParseQueryAdapter<ParseObject> {
 
         final ParseImageView pic = h.img;
         //pic.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        ParseFile f = object.getParseFile("image");
+        ParseFile f = null;
+        if (container == Constants.CONTAINER_LIST) {
+            f = object.getParseFile("image");
+        } else if (container == Constants.CONTAINER_GRID) {
+            f = object.getParseFile("thumbnail");
+        }
         ((AspectRatioImageView)pic).setObjectId(object.getObjectId());
         Picasso.with(mContext).load(f.getUrl()).into(pic);
         return v;
