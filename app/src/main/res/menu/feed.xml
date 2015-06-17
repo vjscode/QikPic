@@ -5,4 +5,10 @@
         android:title="@string/action_logout"
         android:orderInCategory="100"
         android:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_search"
+        android:title="@string/menu_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:showAsAction="always"/>
 </menu>

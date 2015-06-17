@@ -26,5 +26,9 @@
     <string name="title_activity_detail">Detail</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="action_save">save</string>
+    <string name="title_activity_tag_search">TagSearchActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="search_hint">tag</string>
+    <string name="menu_search">search</string>
 
 </resources>
