@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,12 +57,14 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_list_item_detail);
         imageView = (ParseImageView) findViewById(R.id.image);
         tagPanel = (LinearLayout) findViewById(R.id.taggingPanel);
         addTagIcon = (ImageView) findViewById(R.id.addTagIcon);
         addTagIcon.setOnClickListener(this);
         id = getIntent().getStringExtra("id");
+        setProgressBarIndeterminateVisibility(true);
         if (!id.equals("new")) {
             loadImage();
         } else {
@@ -96,6 +99,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     private void loadImageFromUri() {
         imageView.setImageURI(uri);
+        setProgressBarIndeterminateVisibility(false);
     }
 
     private void loadImage() {
@@ -106,6 +110,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 if (e == null) {
                     showImage(object);
                     showTags(object);
+                    setProgressBarIndeterminateVisibility(false);
                 } else {
                     // something went wrong
                 }
@@ -193,14 +198,18 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     }
 
    private void saveQikPik() {
+       setProgressBarIndeterminateVisibility(true);
        ParseQuery<ParseObject> query = ParseQuery.getQuery("QikPik");
        query.getInBackground(id, new GetCallback<ParseObject>() {
            public void done(ParseObject object, ParseException e) {
+               setProgressBarIndeterminateVisibility(false);
                List<String> tags = object.getList("tags");
                if (tags == null) {
                    tags = new ArrayList<String>();
                }
-               tags.addAll(tempTagList);
+               if (tempTagList != null) {
+                   tags.addAll(tempTagList);
+               }
                object.put("tags", tags);
                object.saveInBackground();
                setResult(Activity.RESULT_OK);
@@ -211,6 +220,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
    private void createQikPik() {
        try {
+           setProgressBarIndeterminateVisibility(true);
            AssetFileDescriptor fileDescriptor = null;
            fileDescriptor =
                    getContentResolver().openAssetFileDescriptor(uri, "r");
@@ -266,6 +276,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         po.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
+                setProgressBarIndeterminateVisibility(false);
                 Log.d(TAG, "Success saving object: " + e);
                 removeFileFromDisk();
                 setResult(Activity.RESULT_OK);

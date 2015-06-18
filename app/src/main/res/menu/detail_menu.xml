@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <!-- Search, should appear as action button -->
     <item android:id="@+id/action_save"
-        android:icon="@drawable/save_icon"
+        android:icon="@drawable/ic_save_white_24dp"
         android:title="@string/action_save"
         android:showAsAction="ifRoom" />
 </menu>
