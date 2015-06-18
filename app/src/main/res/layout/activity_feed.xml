@@ -4,40 +4,64 @@
     android:layout_height="match_parent"
     tools:context="com.tuts.vijay.qikpic.activity.FeedActivity">
 
-    <ImageView
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/capture"
-        android:id="@+id/capture"
-        android:layout_gravity="center"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/profileChrome"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/qikpik_name_count"
+            android:layout_marginLeft="20dp"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:textSize="20sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/qikpikCount"
+            android:typeface="sans"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/uiswitcher"
-        android:layout_below="@id/capture"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/ui_switcher_bkg"
+        android:layout_below="@id/profileChrome">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/grid_icon"
+            android:src="@drawable/grid_bkg"
             android:id="@+id/grid_icon"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp"
+            android:layout_weight="1"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/list_icon"
+            android:src="@drawable/list_bkg"
             android:id="@+id/list_icon"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/capture"
+            android:id="@+id/capture"
+            android:layout_margin="5dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/uiswitcher"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:id="@+id/fragmentContainer">
 
     </FrameLayout>

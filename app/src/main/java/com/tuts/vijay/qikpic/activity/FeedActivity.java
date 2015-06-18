@@ -17,10 +17,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.CountCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
@@ -50,6 +54,8 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
 
     Fragment currentFragment;
 
+    TextView txtQikPikCount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +71,8 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         listIcon.setOnClickListener(this);
         captureBtn = (ImageView) findViewById(R.id.capture);
         captureBtn.setOnClickListener(this);
+        txtQikPikCount = (TextView) findViewById(R.id.qikpikCount);
+        runQikPikCountQuery();
     }
 
     private void initFragment() {
@@ -198,5 +206,19 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     @Override
     public void onFragmentInteraction(String id) {
 
+    }
+
+    private void runQikPikCountQuery() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("QikPik");
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.countInBackground(new CountCallback() {
+            public void done(int count, ParseException e) {
+                if (e == null) {
+                    txtQikPikCount.setText(count + "");
+                } else {
+                    // The request failed
+                }
+            }
+        });
     }
 }
