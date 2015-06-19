@@ -17,13 +17,15 @@ import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
 import com.tuts.vijay.qikpic.adapter.QikPicSearchParseQueryAdapter;
 import com.tuts.vijay.qikpic.listener.GridViewItemClickListener;
 
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link PhotosGridFragment#newInstance} factory method to
  * create an instance of this fragment.
  *
  */
-public class PhotosGridFragment extends Fragment implements ActivityInteraction {
+public class PhotosGridFragment extends Fragment implements ActivityInteraction, ParseQueryAdapter.OnQueryLoadListener {
 
     private ParseQueryAdapter<ParseObject> mAdapter;
     private GridView mGridView;
@@ -63,10 +65,14 @@ public class PhotosGridFragment extends Fragment implements ActivityInteraction 
         }
         if (isSearch) {
             mAdapter = new QikPicSearchParseQueryAdapter(getActivity(), "QikPik", searchTag);
-            ((QikPicSearchParseQueryAdapter)mAdapter).setContainerType(Constants.CONTAINER_GRID);
+            QikPicSearchParseQueryAdapter searchAdapter = (QikPicSearchParseQueryAdapter)mAdapter;
+            searchAdapter.setContainerType(Constants.CONTAINER_GRID);
+            searchAdapter.addOnQueryLoadListener(this);
         } else {
             mAdapter = new QikPicParseQueryAdapter(getActivity(), "QikPik");
-            ((QikPicParseQueryAdapter)mAdapter).setContainerType(Constants.CONTAINER_GRID);
+            QikPicParseQueryAdapter queryAdapter = (QikPicParseQueryAdapter)mAdapter;
+            queryAdapter.setContainerType(Constants.CONTAINER_GRID);
+            queryAdapter.addOnQueryLoadListener(this);
         }
 
         mGridView.setAdapter(mAdapter);
@@ -76,5 +82,17 @@ public class PhotosGridFragment extends Fragment implements ActivityInteraction 
     @Override
     public void loadObjects() {
         mAdapter.loadObjects();
+    }
+
+    @Override
+    public void onLoading() {
+        getActivity().findViewById(R.id.loadingProgress).setVisibility(View.VISIBLE);
+        mGridView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onLoaded(List list, Exception e) {
+        getActivity().findViewById(R.id.loadingProgress).setVisibility(View.GONE);
+        mGridView.setVisibility(View.VISIBLE);
     }
 }

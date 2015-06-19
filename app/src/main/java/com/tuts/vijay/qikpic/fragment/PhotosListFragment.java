@@ -16,7 +16,9 @@ import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.adapter.QikPicParseQueryAdapter;
 import com.tuts.vijay.qikpic.listener.ListViewItemClickListener;
 
-public class PhotosListFragment extends Fragment implements ActivityInteraction {
+import java.util.List;
+
+public class PhotosListFragment extends Fragment implements ActivityInteraction, ParseQueryAdapter.OnQueryLoadListener {
 
     private OnFragmentInteractionListener mListener;
     private ParseQueryAdapter<ParseObject> mAdapter;
@@ -39,8 +41,6 @@ public class PhotosListFragment extends Fragment implements ActivityInteraction 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //setListAdapter(mAdapter);
     }
 
 
@@ -59,6 +59,18 @@ public class PhotosListFragment extends Fragment implements ActivityInteraction 
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onLoading() {
+        getActivity().findViewById(R.id.loadingProgress).setVisibility(View.VISIBLE);
+        mListView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onLoaded(List list, Exception e) {
+        getActivity().findViewById(R.id.loadingProgress).setVisibility(View.GONE);
+        mListView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -87,8 +99,10 @@ public class PhotosListFragment extends Fragment implements ActivityInteraction 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mAdapter = new QikPicParseQueryAdapter(getActivity(), "QikPik");//ParseQueryAdapter<ParseObject>(this, "QikPik");
-        ((QikPicParseQueryAdapter)mAdapter).setContainerType(Constants.CONTAINER_LIST);
+        mAdapter = new QikPicParseQueryAdapter(getActivity(), "QikPik");
+        QikPicParseQueryAdapter parseAdapter = (QikPicParseQueryAdapter)mAdapter;
+        parseAdapter.setContainerType(Constants.CONTAINER_LIST);
+        parseAdapter.addOnQueryLoadListener(this);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewItemClickListener(getActivity()));
     }

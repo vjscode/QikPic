@@ -3,6 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.tuts.vijay.qikpic.activity.FeedActivity">
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        android:indeterminate="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone">
+    </ProgressBar>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
