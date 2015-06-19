@@ -189,7 +189,8 @@ public class DetailActivity extends Activity implements View.OnClickListener {
             tempTagList = new ArrayList<String>();
         }
         tempTagList.add(tag);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)DisplayUtils.fromDpToPx(this, 32));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
 
         LayoutInflater inflater = LayoutInflater.from(this);
         TextView tagView = (TextView) inflater.inflate(R.layout.tag_view, null, false);

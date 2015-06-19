@@ -31,5 +31,7 @@
     <string name="search_hint">tag</string>
     <string name="menu_search">search</string>
     <string name="qikpik_name_count">QikPiks</string>
+    <string name="active_pane">ACTIVE_PANE</string>
+    <string name="active_pane_default">0</string>
 
 </resources>

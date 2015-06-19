@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.fragment.PhotosGridFragment;
 import com.tuts.vijay.qikpic.fragment.PhotosListFragment;
 
@@ -78,11 +80,19 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     private void initFragment() {
         FragmentManager fm = getFragmentManager();
 
+        int activePane = readActivePane();
         FragmentTransaction ft = fm.beginTransaction();
-        gridFragment = new PhotosGridFragment();
-        ft.add(R.id.fragmentContainer, gridFragment);
-        ft.commit();
-        currentFragment = gridFragment;
+        if (activePane == Constants.CONTAINER_GRID) {
+            gridFragment = new PhotosGridFragment();
+            ft.add(R.id.fragmentContainer, gridFragment);
+            ft.commit();
+            currentFragment = gridFragment;
+        } else {
+            listFragment = new PhotosListFragment();
+            ft.add(R.id.fragmentContainer, listFragment);
+            ft.commit();
+            currentFragment = listFragment;
+        }
     }
 
     @Override
@@ -143,6 +153,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
             ft.replace(R.id.fragmentContainer, listFragment);
             ft.commit();
             currentFragment = listFragment;
+            saveActivePane(Constants.CONTAINER_LIST);
         } else {
             FragmentTransaction ft = fm.beginTransaction();
             if (gridFragment == null) {
@@ -151,6 +162,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
             ft.replace(R.id.fragmentContainer, gridFragment);
             ft.commit();
             currentFragment = gridFragment;
+            saveActivePane(Constants.CONTAINER_GRID);
         }
     }
 
@@ -220,5 +232,18 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
                 }
             }
         });
+    }
+
+    private int readActivePane() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int activePane = sharedPref.getInt(getString(R.string.active_pane), Constants.CONTAINER_GRID);
+        return activePane;
+    }
+
+    private void saveActivePane(int activePane) {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.active_pane), activePane);
+        editor.commit();
     }
 }
