@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="actionbar_background" type="color">#2A829C</item>
+    <drawable name="btn_normal">#2A829C</drawable>
+    <drawable name="btn_pressed">#90BDC2</drawable>
 </resources>
