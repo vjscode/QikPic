@@ -14,7 +14,9 @@
         android:theme="@style/ActionBarTheme" >
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateVisible|stateAlwaysHidden|adjustResize"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
         </activity>
         <activity
             android:name=".activity.DispatchActivity"
@@ -27,7 +29,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SignUpActivity">
+            android:name=".activity.SignUpActivity"
+            android:windowSoftInputMode="stateVisible|stateAlwaysHidden|adjustResize"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
         </activity>
         <activity
             android:name=".activity.NewUserActivity"
