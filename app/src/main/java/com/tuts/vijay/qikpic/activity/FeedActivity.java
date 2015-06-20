@@ -62,6 +62,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
+        getActionBar().setDisplayShowTitleEnabled(false);
         initUI();
         initFragment();
     }

@@ -12,5 +12,5 @@
         android:id="@+id/image"
         android:layout_margin="0dp"
         android:padding="0dp"
-        android:scaleType="fitXY"/>
+        android:scaleType="centerCrop"/>
 </LinearLayout>
