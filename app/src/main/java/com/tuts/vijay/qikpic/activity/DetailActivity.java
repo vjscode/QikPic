@@ -53,6 +53,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     private Uri uri;
     private List<String> tempTagList;
     private boolean isPicNew = false;
+    private boolean savingInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +200,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     }
 
    private void saveQikPik() {
+       savingInProgress = true;
        setProgressBarIndeterminateVisibility(true);
        ParseQuery<ParseObject> query = ParseQuery.getQuery("QikPik");
        query.getInBackground(id, new GetCallback<ParseObject>() {
@@ -214,6 +216,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                object.put("tags", tags);
                object.saveInBackground();
                setResult(Activity.RESULT_OK);
+               savingInProgress = false;
                finish();
            }
        });
@@ -221,6 +224,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
    private void createQikPik() {
        try {
+           savingInProgress = true;
            setProgressBarIndeterminateVisibility(true);
            AssetFileDescriptor fileDescriptor = null;
            fileDescriptor =
@@ -261,8 +265,12 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
        } catch (FileNotFoundException e) {
            e.printStackTrace();
+           savingInProgress = false;
        } catch (IOException e) {
            e.printStackTrace();
+           savingInProgress = false;
+       } catch (RuntimeException re) {
+           savingInProgress = false;
        }
    }
 
@@ -281,6 +289,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 Log.d(TAG, "Success saving object: " + e);
                 removeFileFromDisk();
                 setResult(Activity.RESULT_OK);
+                savingInProgress = false;
                 finish();
             }
         });
@@ -297,5 +306,17 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     private void removeFileFromDisk() {
         Log.d("test", "deleted? " + new File(uri.getPath()).delete());
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (savingInProgress) {
+            return;
+        }
+        if (isPicNew) {
+            createQikPik();
+        } else {
+            saveQikPik();
+        }
     }
 }
