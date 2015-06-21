@@ -52,11 +52,14 @@
             android:layout_margin="5dp"
             android:layout_weight="1"/>
         <ImageView
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/capture"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_photo_camera_white_24dp"
             android:id="@+id/capture"
-            android:layout_margin="5dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_weight="1"/>
     </LinearLayout>
 
