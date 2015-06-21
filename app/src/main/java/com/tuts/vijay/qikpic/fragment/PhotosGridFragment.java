@@ -52,6 +52,7 @@ public class PhotosGridFragment extends Fragment implements ActivityInteraction,
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_photos_grid, container, false);
         mGridView = (GridView) view.findViewById(R.id.gridView);
+        mGridView.setEmptyView(view.findViewById(R.id.emptyElement));
         return view;
     }
 

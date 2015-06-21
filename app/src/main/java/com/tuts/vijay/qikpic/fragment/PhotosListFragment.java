@@ -93,6 +93,7 @@ public class PhotosListFragment extends Fragment implements ActivityInteraction,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photos_list, container, false);
         mListView = (ListView) view.findViewById(R.id.listView);
+        mListView.setEmptyView(view.findViewById(R.id.emptyElement));
         return view;
     }
 
@@ -104,7 +105,7 @@ public class PhotosListFragment extends Fragment implements ActivityInteraction,
         parseAdapter.setContainerType(Constants.CONTAINER_LIST);
         parseAdapter.addOnQueryLoadListener(this);
         mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(new ListViewItemClickListener(getActivity()));
+        mListView.setOnItemClickListener(new ListViewItemClickListener(getActivity()));;
     }
 
     @Override

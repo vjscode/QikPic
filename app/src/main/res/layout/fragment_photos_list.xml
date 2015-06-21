@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_marginBottom="10dp"
         android:visibility="gone">
     </ProgressBar>
     <ListView
@@ -19,4 +20,11 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="10.0sp"
         android:layout_marginTop="10dp"/>
+    <TextView android:id="@+id/emptyElement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/loadingProgress"
+        android:text="@string/no_qikpics"
+        android:textColor="#FFFFFF"/>
 </RelativeLayout>

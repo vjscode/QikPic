@@ -33,5 +33,6 @@
     <string name="qikpik_name_count">QikPics</string>
     <string name="active_pane">ACTIVE_PANE</string>
     <string name="active_pane_default">0</string>
+    <string name="no_qikpics">No QikPics Yet</string>
 
 </resources>
