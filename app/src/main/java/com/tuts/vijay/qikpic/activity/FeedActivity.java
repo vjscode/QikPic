@@ -206,6 +206,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
             startActivityForTagging();
         } else if (requestCode == SHOW_PHOTO && resultCode == RESULT_OK) {
             ((ActivityInteraction)currentFragment).loadObjects();
+            runQikPikCountQuery();
         }
     }
 

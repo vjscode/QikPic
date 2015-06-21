@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
+import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseImageView;
@@ -31,6 +33,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -38,7 +41,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Activity which displays a registration screen to the user.
@@ -54,6 +59,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     private List<String> tempTagList;
     private boolean isPicNew = false;
     private boolean savingInProgress = false;
+    private Map<String, String> dimensions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         addTagIcon.setOnClickListener(this);
         id = getIntent().getStringExtra("id");
         setProgressBarIndeterminateVisibility(true);
+        dimensions = new HashMap<String, String>();
         if (!id.equals("new")) {
             loadImage();
         } else {
@@ -224,6 +231,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
    private void createQikPik() {
        try {
+           long startTime = SystemClock.elapsedRealtimeNanos();
            savingInProgress = true;
            setProgressBarIndeterminateVisibility(true);
            AssetFileDescriptor fileDescriptor = null;
@@ -261,7 +269,9 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                    = BitmapFactory.decodeFileDescriptor(
                    fileDescriptor.getFileDescriptor(), null, bmOptions);
 
-           prepareAndSaveParseObject(actuallyUsableBitmap, thumbnailImage);
+           Log.d("test", "mid: " + SystemClock.elapsedRealtimeNanos());
+
+           prepareAndSaveParseObject(actuallyUsableBitmap, thumbnailImage, startTime);
 
        } catch (FileNotFoundException e) {
            e.printStackTrace();
@@ -274,7 +284,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
        }
    }
 
-    private void prepareAndSaveParseObject(Bitmap bmp, Bitmap thumbnail) {
+    private void prepareAndSaveParseObject(Bitmap bmp, Bitmap thumbnail, final long startTime) {
         final ParseObject po = new ParseObject("QikPik");
         po.put("user", ParseUser.getCurrentUser());
         po.put("image", getParseFileFromBitmap(bmp, "profile_pic.jpg"));
@@ -290,6 +300,8 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 removeFileFromDisk();
                 setResult(Activity.RESULT_OK);
                 savingInProgress = false;
+                dimensions.put(Constants.TIME_TO_UPLOAD, (SystemClock.elapsedRealtimeNanos() - startTime) + "");
+                ParseAnalytics.trackEventInBackground(Constants.QIKPIK_ANALYTICS, dimensions);
                 finish();
             }
         });

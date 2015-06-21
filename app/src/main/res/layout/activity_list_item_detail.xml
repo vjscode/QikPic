@@ -44,7 +44,7 @@
             android:id="@+id/image"
             android:layout_margin="0dp"
             android:padding="0dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:layout_centerInParent="true"/>
     </RelativeLayout>
 </RelativeLayout>

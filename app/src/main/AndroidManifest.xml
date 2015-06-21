@@ -30,7 +30,7 @@
         </activity>
         <activity
             android:name=".activity.SignUpActivity"
-            android:windowSoftInputMode="stateVisible|stateAlwaysHidden|adjustResize"
+            android:windowSoftInputMode="stateVisible|stateAlwaysHidden|adjustResize|adjustPan"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
         </activity>
         <activity
