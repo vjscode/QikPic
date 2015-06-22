@@ -68,24 +68,18 @@ public class SignUpActivity extends Activity {
         StringBuilder validationErrorMessage = new StringBuilder();
         if (username.length() == 0) {
             validationError = true;
-            validationErrorMessage.append(getString(R.string.error_blank_username));
-        } else if (!username.contains("@")) {
+            validationErrorMessage.append(getString(R.string.error_blank_username) + " ");
+        } else if (!validationError && !username.contains("@")) {
             validationError = true;
-            validationErrorMessage.append(getString(R.string.error_valid_email));
+            validationErrorMessage.append(getString(R.string.error_valid_email) + " ");
         }
-        if (password.length() == 0) {
-            if (validationError) {
-                validationErrorMessage.append(getString(R.string.error_join));
-            }
+        if (!validationError && password.length() == 0) {
             validationError = true;
-            validationErrorMessage.append(getString(R.string.error_blank_password));
+            validationErrorMessage.append(getString(R.string.error_blank_password) + " ");
         }
-        if (!password.equals(passwordAgain)) {
-            if (validationError) {
-                validationErrorMessage.append(getString(R.string.error_join));
-            }
+        if (!validationError && !password.equals(passwordAgain)) {
             validationError = true;
-            validationErrorMessage.append(getString(R.string.error_mismatched_passwords));
+            validationErrorMessage.append(getString(R.string.error_mismatched_passwords) + " ");
         }
 
         // If there is a validation error, display the error

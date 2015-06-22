@@ -63,19 +63,15 @@ public class LoginActivity extends Activity {
 
         // Validate the log in data
         boolean validationError = false;
-        StringBuilder validationErrorMessage = new StringBuilder(getString(R.string.error_intro));
+        StringBuilder validationErrorMessage = new StringBuilder();
         if (username.length() == 0) {
             validationError = true;
-            validationErrorMessage.append(getString(R.string.error_blank_username));
+            validationErrorMessage.append(getString(R.string.error_blank_username) + " ");
         }
-        if (password.length() == 0) {
-            if (validationError) {
-                validationErrorMessage.append(getString(R.string.error_join));
-            }
+        if (!validationError && password.length() == 0) {
             validationError = true;
             validationErrorMessage.append(getString(R.string.error_blank_password));
         }
-        validationErrorMessage.append(getString(R.string.error_end));
 
         // If there is a validation error, display the error
         if (validationError) {
