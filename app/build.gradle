@@ -6,14 +6,14 @@ android {
 
     defaultConfig {
         applicationId "com.tuts.vijay.qikpic"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 20
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
-            runProguard false
+            runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

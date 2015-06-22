@@ -63,6 +63,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
         getActionBar().setDisplayShowTitleEnabled(false);
+        getActionBar().setDisplayShowHomeEnabled(false);
         initUI();
         initFragment();
     }
