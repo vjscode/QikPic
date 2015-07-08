@@ -2,10 +2,14 @@ package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -106,6 +110,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     }
 
     private void loadImageFromUri() {
+
         imageView.setImageURI(uri);
         setProgressBarIndeterminateVisibility(false);
     }
@@ -263,11 +268,15 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                    = BitmapFactory.decodeFileDescriptor(
                    fileDescriptor.getFileDescriptor(), null, bmOptions);
 
+           actuallyUsableBitmap = adjustImageOrientation(actuallyUsableBitmap);
+
            bmOptions.inSampleSize = scaleFactor * 2;
 
            Bitmap thumbnailImage
                    = BitmapFactory.decodeFileDescriptor(
                    fileDescriptor.getFileDescriptor(), null, bmOptions);
+
+           thumbnailImage = adjustImageOrientation(thumbnailImage);
 
            Log.d("test", "mid: " + SystemClock.elapsedRealtimeNanos());
 
@@ -330,5 +339,47 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         } else {
             saveQikPik();
         }
+    }
+
+    private Bitmap adjustImageOrientation(Bitmap image) {
+        ExifInterface exif;
+        try {
+
+            exif = new ExifInterface(new File(uri.getPath()).getAbsolutePath());
+            int exifOrientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+
+            int rotate = 0;
+            switch (exifOrientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+            }
+
+            if (rotate != 0) {
+                int w = image.getWidth();
+                int h = image.getHeight();
+
+                // Setting pre rotate
+                Matrix mtx = new Matrix();
+                mtx.preRotate(rotate);
+
+                // Rotating Bitmap & convert to ARGB_8888, required by tess
+                image = Bitmap.createBitmap(image, 0, 0, w, h, mtx, false);
+
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return image.copy(Bitmap.Config.ARGB_8888, true);
     }
 }
