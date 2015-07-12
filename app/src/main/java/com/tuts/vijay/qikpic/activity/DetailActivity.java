@@ -2,10 +2,8 @@ package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -30,7 +28,6 @@ import com.parse.GetCallback;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -39,6 +36,7 @@ import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
+import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,22 +54,23 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
     private String id;
-    private ParseImageView imageView;
-    private LinearLayout tagPanel;
+    private ImageView imageView;
+    private FlowLayout tagPanel;
     private ImageView addTagIcon;
     private Uri uri;
     private List<String> tempTagList;
     private boolean isPicNew = false;
     private boolean savingInProgress = false;
     private Map<String, String> dimensions;
+    private boolean needsSave = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_list_item_detail);
-        imageView = (ParseImageView) findViewById(R.id.image);
-        tagPanel = (LinearLayout) findViewById(R.id.taggingPanel);
+        imageView = (ImageView) findViewById(R.id.image);
+        tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
         addTagIcon = (ImageView) findViewById(R.id.addTagIcon);
         addTagIcon.setOnClickListener(this);
         id = getIntent().getStringExtra("id");
@@ -110,7 +109,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     }
 
     private void loadImageFromUri() {
-
+        needsSave = true;
         imageView.setImageURI(uri);
         setProgressBarIndeterminateVisibility(false);
     }
@@ -133,7 +132,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     private void showTags(ParseObject object) {
         List<String> tagList = object.getList("tags");
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)DisplayUtils.fromDpToPx(this, 32));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int)DisplayUtils.fromDpToPx(this, 48));
         if (tagList == null) {
             return;
         }
@@ -142,24 +141,14 @@ public class DetailActivity extends Activity implements View.OnClickListener {
             LayoutInflater inflater = LayoutInflater.from(this);
             TextView tagView= (TextView) inflater.inflate(R.layout.tag_view, null, false);
             tagView.setText(tag);
-            tagPanel.addView(tagView, 1, lp);
+            tagPanel.addView(tagView, 0, lp);
         }
     }
 
     private void emptyTagPanel() {
         for (int i = 0; i < tagPanel.getChildCount(); i++) {
-            if (!isViewAnchor(tagPanel.getChildAt(i))) {
-                tagPanel.removeViewAt(i);
-            }
+            tagPanel.removeViewAt(i);
         }
-    }
-
-    private boolean isViewAnchor(View childAt) {
-        int id = childAt.getId();
-        if (id == R.id.addTagIcon || id == R.id.tagIcon) {
-            return true;
-        }
-        return false;
     }
 
     private void showImage(ParseObject object) {
@@ -203,12 +192,13 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         }
         tempTagList.add(tag);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+                (int)DisplayUtils.fromDpToPx(this, 48));
 
         LayoutInflater inflater = LayoutInflater.from(this);
         TextView tagView = (TextView) inflater.inflate(R.layout.tag_view, null, false);
         tagView.setText(tag);
-        tagPanel.addView(tagView, 1, lp);
+        tagPanel.addView(tagView, 0, lp);
+        needsSave = true;
     }
 
    private void saveQikPik() {
@@ -332,6 +322,10 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         if (savingInProgress) {
+            return;
+        }
+        if (!needsSave) {
+            super.onBackPressed();
             return;
         }
         if (isPicNew) {

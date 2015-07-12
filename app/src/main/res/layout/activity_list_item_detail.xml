@@ -3,49 +3,43 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fillViewport="true"
     android:background="#C9C8BF">
-
-<RelativeLayout
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="0dp"
-    android:padding="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/taggingPanel"
-        android:padding="10dp">
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/tag"
-            android:id="@+id/tagIcon"
-            android:layout_marginRight="10dp"/>
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:id="@+id/addTagIcon"
-            android:src="@drawable/add_icon"
-            android:layout_marginLeft="10dp"/>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:layout_margin="0dp"
         android:padding="0dp"
-        android:layout_below="@id/taggingPanel">
-        <com.tuts.vijay.qikpic.view.AspectRatioImageView
+        android:orientation="vertical">
+
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:id="@+id/image"
             android:layout_margin="0dp"
             android:padding="0dp"
             android:scaleType="fitCenter"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
-</RelativeLayout>
+            android:adjustViewBounds="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:padding="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/addTagIcon"
+                android:src="@drawable/add_icon"
+                android:layout_marginLeft="10dp"/>
+
+            <com.tuts.vijay.qikpic.view.FlowLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/taggingPanel">
+            </com.tuts.vijay.qikpic.view.FlowLayout>
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>
