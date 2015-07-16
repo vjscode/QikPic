@@ -8,14 +8,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -36,11 +39,11 @@ import com.squareup.picasso.Picasso;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
+import com.tuts.vijay.qikpic.view.DetailQikPikScrollView;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +66,13 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     private boolean savingInProgress = false;
     private Map<String, String> dimensions;
     private boolean needsSave = false;
+    private Bitmap qikpicBmp;
+    private int scaleFactor = 1;
+    private GestureDetector gestureDetector;
+    private DetailQikPikScrollView scrollView;
+    private boolean mScrollable = false;
+    private boolean listenForScaling = true;
+    ScaleGestureDetector mScaleDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,16 +83,103 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
         addTagIcon = (ImageView) findViewById(R.id.addTagIcon);
         addTagIcon.setOnClickListener(this);
+        scrollView = (DetailQikPikScrollView) findViewById(R.id.scrollContainer);
+        scrollView.setScrollable(true);
         id = getIntent().getStringExtra("id");
         setProgressBarIndeterminateVisibility(true);
         dimensions = new HashMap<String, String>();
+        gestureDetector = new GestureDetector(this, new GestureListener());
         if (!id.equals("new")) {
             loadImage();
         } else {
             isPicNew = true;
             uri = getIntent().getParcelableExtra("uri");
-            loadImageFromUri();
+            Bitmap bmp = setBitmapFromUri();
+            loadImageFromBitmap(bmp);
         }
+        imageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                gestureDetector.onTouchEvent(motionEvent);
+                mScaleDetector.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+        initScaleGestureDetector();
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if (mScrollable) {
+                float currentX = imageView.getScrollX();
+                float currentY = imageView.getScrollY();
+                imageView.setScrollX((int) (currentX + distanceX));
+                imageView.setScrollY((int) (currentY + distanceY));
+            }
+            return true;
+        }
+
+        /*@Override
+        public boolean onDoubleTap(MotionEvent e) {
+            if (mScrollable == false) {
+                imageView.setScaleX(2.0f);
+                imageView.setScaleY(2.0f);
+                mScrollable = true;
+                scrollView.setScrollable(false);
+            } else {
+                imageView.setScaleX(1.0f);
+                imageView.setScaleY(1.0f);
+                imageView.setScrollX(0);
+                imageView.setScrollY(0);
+                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                mScrollable = false;
+                scrollView.setScrollable(true);
+            }
+            //mScrollable = scrollMode;
+            return super.onDoubleTap(e);
+        }*/
+    }
+
+    private void initScaleGestureDetector() {
+        mScaleDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.OnScaleGestureListener() {
+            float scaleStart;
+            @Override
+            public void onScaleEnd(ScaleGestureDetector detector) {
+                listenForScaling = true;
+                ParseAnalytics.trackEventInBackground(Constants.ZOOMED);
+            }
+            @Override
+            public boolean onScaleBegin(ScaleGestureDetector detector) {
+                scaleStart = detector.getScaleFactor();
+                return true;
+            }
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                if (listenForScaling) {
+                    if (detector.getScaleFactor() - scaleStart > 0/*mScrollable == false*/) {
+                        imageView.setScaleX(2.0f);
+                        imageView.setScaleY(2.0f);
+                        mScrollable = true;
+                        scrollView.setScrollable(false);
+                        listenForScaling = false;
+                    } else if (detector.getScaleFactor() - scaleStart < 0) {
+                        imageView.setScaleX(1.0f);
+                        imageView.setScaleY(1.0f);
+                        imageView.setScrollX(0);
+                        imageView.setScrollY(0);
+                        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                        mScrollable = false;
+                        scrollView.setScrollable(true);
+                        listenForScaling = false;
+                    } else {
+                        listenForScaling = true;
+                    }
+
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -106,6 +203,12 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 break;
         }
         return true;
+    }
+
+    private void loadImageFromBitmap(Bitmap bmp) {
+        needsSave = true;
+        imageView.setImageBitmap(bmp);
+        setProgressBarIndeterminateVisibility(false);
     }
 
     private void loadImageFromUri() {
@@ -226,58 +329,21 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
    private void createQikPik() {
        try {
-           long startTime = SystemClock.elapsedRealtimeNanos();
+           long startTime = System.currentTimeMillis();
            savingInProgress = true;
            setProgressBarIndeterminateVisibility(true);
-           AssetFileDescriptor fileDescriptor = null;
-           fileDescriptor =
-                   getContentResolver().openAssetFileDescriptor(uri, "r");
+           Bitmap actuallyUsableBitmap = null;
+           if (qikpicBmp == null) {
+               setBitmapFromUri();
+           }
+           actuallyUsableBitmap = qikpicBmp;
 
-           float targetW = imageView.getWidth();
-           float targetH = imageView.getHeight();
+           Bitmap thumbnailImage = ThumbnailUtils.extractThumbnail(actuallyUsableBitmap, actuallyUsableBitmap.getWidth()/2, actuallyUsableBitmap.getHeight()/2);
 
-           // Get the dimensions of the bitmap
-           BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-           bmOptions.inJustDecodeBounds = true;
-           BitmapFactory.decodeFileDescriptor(
-                   fileDescriptor.getFileDescriptor(), null, bmOptions);
-           float photoW = bmOptions.outWidth;
-           float photoH = bmOptions.outHeight;
-
-           float scale = Math.max(photoW/targetW, photoH/targetH);
-
-           // Determine how much to scale down the image
-           int scaleFactor = (int)Math.ceil((double)scale) * 2;
-
-           // Decode the image file into a Bitmap sized to fill the View
-           bmOptions.inJustDecodeBounds = false;
-           bmOptions.inSampleSize = scaleFactor;
-           bmOptions.inPurgeable = true;
-
-           Bitmap actuallyUsableBitmap
-                   = BitmapFactory.decodeFileDescriptor(
-                   fileDescriptor.getFileDescriptor(), null, bmOptions);
-
-           actuallyUsableBitmap = adjustImageOrientation(actuallyUsableBitmap);
-
-           bmOptions.inSampleSize = scaleFactor * 2;
-
-           Bitmap thumbnailImage
-                   = BitmapFactory.decodeFileDescriptor(
-                   fileDescriptor.getFileDescriptor(), null, bmOptions);
-
-           thumbnailImage = adjustImageOrientation(thumbnailImage);
-
-           Log.d("test", "mid: " + SystemClock.elapsedRealtimeNanos());
+           Log.d("test", "mid: " + System.currentTimeMillis());
 
            prepareAndSaveParseObject(actuallyUsableBitmap, thumbnailImage, startTime);
 
-       } catch (FileNotFoundException e) {
-           e.printStackTrace();
-           savingInProgress = false;
-       } catch (IOException e) {
-           e.printStackTrace();
-           savingInProgress = false;
        } catch (RuntimeException re) {
            savingInProgress = false;
        }
@@ -299,7 +365,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 removeFileFromDisk();
                 setResult(Activity.RESULT_OK);
                 savingInProgress = false;
-                dimensions.put(Constants.TIME_TO_UPLOAD, (SystemClock.elapsedRealtimeNanos() - startTime) + "");
+                dimensions.put(Constants.TIME_TO_UPLOAD, (System.currentTimeMillis() - startTime) + "");
                 ParseAnalytics.trackEventInBackground(Constants.QIKPIK_ANALYTICS, dimensions);
                 finish();
             }
@@ -369,11 +435,57 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
                 // Rotating Bitmap & convert to ARGB_8888, required by tess
                 image = Bitmap.createBitmap(image, 0, 0, w, h, mtx, false);
-
             }
         } catch (IOException e) {
             return null;
         }
         return image.copy(Bitmap.Config.ARGB_8888, true);
+    }
+
+    private Bitmap setBitmapFromUri() {
+        AssetFileDescriptor fileDescriptor = null;
+        try {
+            fileDescriptor =
+                    getContentResolver().openAssetFileDescriptor(uri, "r");
+
+            int widthPixels = DisplayUtils.getWidth(this);
+            int heightPixels = DisplayUtils.getHeight(this) / 2;
+
+            float targetW = widthPixels;
+            float targetH = heightPixels;
+
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFileDescriptor(
+                    fileDescriptor.getFileDescriptor(), null, bmOptions);
+            float photoW = bmOptions.outWidth;
+            float photoH = bmOptions.outHeight;
+
+            float scale = Math.max(photoW / targetW, photoH / targetH);
+
+            Log.d("test", "SCALE: " + scale);
+
+            // Determine how much to scale down the image
+            scaleFactor = (int) Math.ceil((double) scale) * 2;
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+
+            Bitmap actuallyUsableBitmap
+                    = BitmapFactory.decodeFileDescriptor(
+                    fileDescriptor.getFileDescriptor(), null, bmOptions);
+
+            qikpicBmp =  adjustImageOrientation(actuallyUsableBitmap);
+            return qikpicBmp;
+        } catch (IOException io) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

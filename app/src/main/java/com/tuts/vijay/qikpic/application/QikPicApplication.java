@@ -13,6 +13,7 @@ public class QikPicApplication extends android.app.Application {
     }
 
     private void initializeParse() {
+        Parse.enableLocalDatastore(this);
         //Add your parse credentials here
         Parse.initialize(this, "",
                 "");
