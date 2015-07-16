@@ -30,6 +30,7 @@ public class TagSearchActivity extends Activity {
         Bundle b = new Bundle();
         b.putBoolean("isSearch", true);
         b.putString("q", q);
+        getActionBar().setTitle(q);
         gridFragment.setArguments(b);
         ft.add(R.id.fragmentContainer, gridFragment);
         ft.commit();
