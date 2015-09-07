@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
@@ -44,11 +45,14 @@ import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Activity which displays a registration screen to the user.
@@ -343,11 +347,59 @@ public class DetailActivity extends Activity implements View.OnClickListener {
            Log.d("test", "mid: " + System.currentTimeMillis());
 
            prepareAndSaveParseObject(actuallyUsableBitmap, thumbnailImage, startTime);
+           //prepareAndSaveLocally(actuallyUsableBitmap, thumbnailImage, startTime);
+
+           //printLocal();
+
+           //saveRotatedImageAndSendToService();
 
        } catch (RuntimeException re) {
            savingInProgress = false;
        }
    }
+
+    private void printLocal() {
+        ParseQuery query = new ParseQuery("QikPik");
+        query.fromPin("qikpic_drafts");
+        query.whereEqualTo("isDraft", true);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                Log.d("test", "list: " + list + ", e: " + e);
+                for (final ParseObject p : list) {
+                    Log.d("test", "p: " + p.get("image"));
+                    Log.d("test", "p: " + p.get("thumbnail"));
+                }
+            }
+
+        });
+    }
+
+    private String saveRotatedImageAndSendToService(Bitmap bmp, String img) {
+        String path = uri.getPath();
+        if (img.equals("thumbnail")) {
+            String bmp_name = path.substring(0, path.lastIndexOf(".jpg"));
+            ThumbnailUtils.extractThumbnail(bmp, bmp.getWidth()/2, bmp.getHeight()/2);
+            path = bmp_name + "_thumbnail.jpg";
+        }
+        Log.d("test", "uri: " + path);
+        File f = new File(path);
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(f);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fOut.flush();
+                fOut.close();
+            } catch (IOException ioe) {
+
+            }
+        }
+        return path;
+    }
 
     private void prepareAndSaveParseObject(Bitmap bmp, Bitmap thumbnail, final long startTime) {
         final ParseObject po = new ParseObject("QikPik");
@@ -370,6 +422,30 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                 finish();
             }
         });
+    }
+
+    private void prepareAndSaveLocally(Bitmap bmp, Bitmap thumbnail, final long startTime) {
+        final ParseObject po = new ParseObject("QikPik");
+        po.put("user", ParseUser.getCurrentUser());
+        po.put("uuid", UUID.randomUUID().toString());
+        po.put("isDraft", true);
+        po.put("image", saveRotatedImageAndSendToService(bmp, "image"));//getParseFileFromBitmap(bmp, "profile_pic.jpg"));
+        po.put("thumbnail", saveRotatedImageAndSendToService(bmp, "thumbnail"));
+        if (tempTagList != null) {
+            po.put("tags", tempTagList);
+        }
+        po.pinInBackground("qikpic_drafts",
+                new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            //send intent to intent service
+                            Log.d("test", "saved to db");
+                            //finish activity
+                            finish();
+                        }
+                    }
+                });
     }
 
     private ParseFile getParseFileFromBitmap(Bitmap bmp, String name) {
