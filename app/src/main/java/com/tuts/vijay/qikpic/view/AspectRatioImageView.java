@@ -2,15 +2,14 @@ package com.tuts.vijay.qikpic.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
-import com.parse.ParseImageView;
+import android.widget.ImageView;
 
 /**
  * Created by vijay on 6/5/15.
  */
-public class AspectRatioImageView extends ParseImageView {
+public class AspectRatioImageView extends ImageView {
 
-    private static final float aspectRatio = 1.0f;
+    private float aspectRatio = 1.0f;
     private String objectId;
 
     public AspectRatioImageView(Context context) {
@@ -40,5 +39,9 @@ public class AspectRatioImageView extends ParseImageView {
 
     public void setObjectId(String objectId) {
         this.objectId = objectId;
+    }
+
+    public void setAspectRatio(float ar) {
+        this.aspectRatio = ar;
     }
 }

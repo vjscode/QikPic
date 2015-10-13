@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.tuts.vijay.qikpic.R;
-import com.tuts.vijay.qikpic.fragment.PhotosGridFragment;
+import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 
 public class TagSearchActivity extends Activity {
 
-    PhotosGridFragment gridFragment;
+    QikPicGridFragment gridFragment;
     private String searchTag;
 
     @Override
@@ -26,7 +26,7 @@ public class TagSearchActivity extends Activity {
         FragmentManager fm = getFragmentManager();
 
         FragmentTransaction ft = fm.beginTransaction();
-        gridFragment = new PhotosGridFragment();
+        gridFragment = new QikPicGridFragment();
         Bundle b = new Bundle();
         b.putBoolean("isSearch", true);
         b.putString("q", q);

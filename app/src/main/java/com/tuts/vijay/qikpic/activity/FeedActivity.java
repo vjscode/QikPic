@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +31,9 @@ import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
-import com.tuts.vijay.qikpic.fragment.PhotosGridFragment;
-import com.tuts.vijay.qikpic.fragment.PhotosListFragment;
+import com.tuts.vijay.qikpic.async.UploadTask;
+import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
+import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class FeedActivity extends Activity implements View.OnClickListener, PhotosListFragment.OnFragmentInteractionListener {
+public class FeedActivity extends Activity implements View.OnClickListener, QikPicListFragment.OnFragmentInteractionListener {
 
     private static final int TAKE_PHOTO = 0;
     private static final int SHOW_PHOTO = 1;
@@ -51,8 +53,10 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     private ImageView listIcon;
 
     //Fragments
-    PhotosGridFragment gridFragment;
-    PhotosListFragment listFragment;
+    //PhotosGridFragment gridFragment;
+    QikPicGridFragment gridFragment;
+    //PhotosListFragment listFragment;
+    QikPicListFragment listFragment;
 
     Fragment currentFragment;
 
@@ -76,7 +80,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         captureBtn = (ImageView) findViewById(R.id.capture);
         captureBtn.setOnClickListener(this);
         txtQikPikCount = (TextView) findViewById(R.id.qikpikCount);
-        runQikPikCountQuery();
+        //runQikPikCountQuery();
     }
 
     private void initFragment() {
@@ -85,12 +89,12 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         int activePane = readActivePane();
         FragmentTransaction ft = fm.beginTransaction();
         if (activePane == Constants.CONTAINER_GRID) {
-            gridFragment = new PhotosGridFragment();
+            gridFragment = new QikPicGridFragment();
             ft.add(R.id.fragmentContainer, gridFragment);
             ft.commit();
             currentFragment = gridFragment;
         } else {
-            listFragment = new PhotosListFragment();
+            listFragment = new QikPicListFragment();//PhotosListFragment();
             ft.add(R.id.fragmentContainer, listFragment);
             ft.commit();
             currentFragment = listFragment;
@@ -150,7 +154,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         if (id == R.id.list_icon) {
             FragmentTransaction ft = fm.beginTransaction();
             if (listFragment == null) {
-                listFragment = new PhotosListFragment();
+                listFragment = new QikPicListFragment();
             }
             ft.replace(R.id.fragmentContainer, listFragment);
             ft.commit();
@@ -159,7 +163,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         } else {
             FragmentTransaction ft = fm.beginTransaction();
             if (gridFragment == null) {
-                gridFragment = new PhotosGridFragment();
+                gridFragment = new QikPicGridFragment();
             }
             ft.replace(R.id.fragmentContainer, gridFragment);
             ft.commit();
@@ -178,10 +182,12 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
     }
 
     Uri mCurrentPhotoUri;
+    String mCurrentTimeStamp;
 
     private void createImageFileUri() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
@@ -190,13 +196,14 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         mCurrentPhotoUri = Uri.fromFile(image);
+        mCurrentTimeStamp = timeStamp;
     }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoUri);
+
         startActivityForResult(takePictureIntent, TAKE_PHOTO);
     }
 
@@ -213,8 +220,10 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
 
     private void startActivityForTagging() {
         Intent i = new Intent(this, DetailActivity.class);
-        i.putExtra("id", "new");
+        i.putExtra("oldOrNew", "new");
+        Log.d("test", "feed uri:>> " + mCurrentTimeStamp);
         i.putExtra("uri", mCurrentPhotoUri);
+        i.putExtra("thumbnailname", mCurrentTimeStamp);
         startActivityForResult(i, SHOW_PHOTO);
     }
 
@@ -239,7 +248,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
 
     private int readActivePane() {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        int activePane = sharedPref.getInt(getString(R.string.active_pane), Constants.CONTAINER_GRID);
+        int activePane = sharedPref.getInt(getString(R.string.active_pane), Constants.CONTAINER_LIST);
         return activePane;
     }
 
@@ -248,5 +257,33 @@ public class FeedActivity extends Activity implements View.OnClickListener, Phot
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.active_pane), activePane);
         editor.commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new UploadTask(this).execute();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mCurrentPhotoUri != null) {
+            outState.putString("cameraImageUri", mCurrentPhotoUri.toString());
+        }
+        if (mCurrentTimeStamp != null) {
+            outState.putString("picTimeStamp", mCurrentTimeStamp);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey("cameraImageUri")) {
+            mCurrentPhotoUri = Uri.parse(savedInstanceState.getString("cameraImageUri"));
+        }
+        if (savedInstanceState.containsKey("picTimeStamp")) {
+            mCurrentTimeStamp = savedInstanceState.getString("picTimeStamp");
+        }
     }
 }
