@@ -55,7 +55,7 @@ public class QikPicGridFragment extends Fragment implements LoaderManager.Loader
         dataProvider = new QikPikContentProvider();
 
         String[] dataColumns = { "thumbnail" };
-        int[] viewIDs = { R.id.image };
+        int[] viewIDs = { R.id.gridImage };
 
         cusrsorAdapter = new QikPicCursorAdapter(getActivity(), R.layout.adapter_grid_item,
                 null, dataColumns, viewIDs, 0);

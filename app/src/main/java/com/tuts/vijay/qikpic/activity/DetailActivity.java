@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -23,7 +24,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +36,6 @@ import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
-import com.tuts.vijay.qikpic.view.DetailQikPikScrollView;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.io.File;
@@ -68,7 +67,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     private Bitmap qikpicBmp;
     private int scaleFactor = 1;
     private GestureDetector gestureDetector;
-    private DetailQikPikScrollView scrollView;
+    //private DetailQikPikScrollView scrollView;
     private boolean mScrollable = false;
     private boolean listenForScaling = true;
     ScaleGestureDetector mScaleDetector;
@@ -76,14 +75,15 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        //requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(0x1A90BDC2));
         setContentView(R.layout.activity_list_item_detail);
-        imageView = (ImageView) findViewById(R.id.image);
+        imageView = (ImageView) findViewById(R.id.imageDetail);
         tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
         addTagIcon = (ImageView) findViewById(R.id.addTagIcon);
         addTagIcon.setOnClickListener(this);
-        scrollView = (DetailQikPikScrollView) findViewById(R.id.scrollContainer);
-        scrollView.setScrollable(true);
+        //scrollView = (DetailQikPikScrollView) findViewById(R.id.scrollContainer);
+        //scrollView.setScrollable(true);
         oldOrNew = getIntent().getStringExtra("oldOrNew");
         setProgressBarIndeterminateVisibility(true);
         dimensions = new HashMap<String, String>();
@@ -113,12 +113,12 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            if (mScrollable) {
+            //if (mScrollable) {
                 float currentX = imageView.getScrollX();
                 float currentY = imageView.getScrollY();
                 imageView.setScrollX((int) (currentX + distanceX));
                 imageView.setScrollY((int) (currentY + distanceY));
-            }
+            //}
             return true;
         }
 
@@ -163,7 +163,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                         imageView.setScaleX(2.0f);
                         imageView.setScaleY(2.0f);
                         mScrollable = true;
-                        scrollView.setScrollable(false);
+                        //scrollView.setScrollable(false);
                         listenForScaling = false;
                     } else if (detector.getScaleFactor() - scaleStart < 0) {
                         imageView.setScaleX(1.0f);
@@ -172,7 +172,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                         imageView.setScrollY(0);
                         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                         mScrollable = false;
-                        scrollView.setScrollable(true);
+                        //scrollView.setScrollable(true);
                         listenForScaling = false;
                     } else {
                         listenForScaling = true;
