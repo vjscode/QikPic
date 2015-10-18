@@ -12,9 +12,24 @@
         <item name="android:background">@color/actionbar_background</item>
     </style>
 
-    <!-- the theme applied to the application or activity -->
+    <!-- the theme applied to the application or activity for showing window overlay -->
     <style name="QikPicOverlayActionBarTheme"
         parent="@android:style/Theme.Holo.Light.DarkActionBar">
         <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="TagDialogTheme" parent="@android:style/Theme.Panel">
+        <item name="android:windowAnimationStyle">@style/TagDialog.Window</item>
+    </style>
+
+    <style name="TagDialog.Window" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/tag_dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/tag_dialog_out</item>
+    </style>
+
+
+    <style name="TagDialogWindowAnimation">
+        <item name="android:windowEnterAnimation">@anim/tag_dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/tag_dialog_out</item>
     </style>
 </resources>

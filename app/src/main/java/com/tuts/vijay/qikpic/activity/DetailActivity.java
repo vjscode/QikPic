@@ -1,9 +1,8 @@
 package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -24,7 +23,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +34,8 @@ import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
+import com.tuts.vijay.qikpic.fragment.QikPicTagsFragment;
+import com.tuts.vijay.qikpic.listener.TagListener;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.io.File;
@@ -50,13 +50,12 @@ import java.util.Map;
 /**
  * Activity which displays a registration screen to the user.
  */
-public class DetailActivity extends Activity implements View.OnClickListener {
+public class DetailActivity extends Activity implements View.OnClickListener, TagListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
     private String oldOrNew;
     private ImageView imageView;
     private FlowLayout tagPanel;
-    private ImageView addTagIcon;
     private Uri uri;
     private String timeStampForFileName;
     private List<String> tempTagList;
@@ -67,7 +66,6 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     private Bitmap qikpicBmp;
     private int scaleFactor = 1;
     private GestureDetector gestureDetector;
-    //private DetailQikPikScrollView scrollView;
     private boolean mScrollable = false;
     private boolean listenForScaling = true;
     ScaleGestureDetector mScaleDetector;
@@ -75,15 +73,10 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         getActionBar().setBackgroundDrawable(new ColorDrawable(0x1A90BDC2));
         setContentView(R.layout.activity_list_item_detail);
         imageView = (ImageView) findViewById(R.id.imageDetail);
         tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
-        addTagIcon = (ImageView) findViewById(R.id.addTagIcon);
-        addTagIcon.setOnClickListener(this);
-        //scrollView = (DetailQikPikScrollView) findViewById(R.id.scrollContainer);
-        //scrollView.setScrollable(true);
         oldOrNew = getIntent().getStringExtra("oldOrNew");
         setProgressBarIndeterminateVisibility(true);
         dimensions = new HashMap<String, String>();
@@ -110,15 +103,18 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         initScaleGestureDetector();
     }
 
+    @Override
+    public void addTag(String tag) {
+        addTagToList(tag);
+    }
+
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            //if (mScrollable) {
-                float currentX = imageView.getScrollX();
-                float currentY = imageView.getScrollY();
-                imageView.setScrollX((int) (currentX + distanceX));
-                imageView.setScrollY((int) (currentY + distanceY));
-            //}
+            float currentX = imageView.getScrollX();
+            float currentY = imageView.getScrollY();
+            imageView.setScrollX((int) (currentX + distanceX));
+            imageView.setScrollY((int) (currentY + distanceY));
             return true;
         }
 
@@ -163,7 +159,6 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                         imageView.setScaleX(2.0f);
                         imageView.setScaleY(2.0f);
                         mScrollable = true;
-                        //scrollView.setScrollable(false);
                         listenForScaling = false;
                     } else if (detector.getScaleFactor() - scaleStart < 0) {
                         imageView.setScaleX(1.0f);
@@ -172,7 +167,6 @@ public class DetailActivity extends Activity implements View.OnClickListener {
                         imageView.setScrollY(0);
                         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                         mScrollable = false;
-                        //scrollView.setScrollable(true);
                         listenForScaling = false;
                     } else {
                         listenForScaling = true;
@@ -198,14 +192,23 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         switch (item.getItemId()) {
             case R.id.action_save:
                 if (isPicNew) {
-                    //createQikPik();
                     createThumbnail();
                 } else {
                     saveQikPik();
                 }
                 break;
+            case R.id.action_tag:
+                createAndShowTagDialog();
         }
         return true;
+    }
+
+    private void createAndShowTagDialog() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.tag_dialog_in, R.anim.tag_dialog_out);
+        QikPicTagsFragment dialogFragment = new QikPicTagsFragment (this);
+        ((QikPicTagsFragment)dialogFragment).setTags(tempTagList);
+        dialogFragment.show(ft, "Tag Fragment");
     }
 
     private void createThumbnail() {
@@ -304,7 +307,7 @@ public class DetailActivity extends Activity implements View.OnClickListener {
         Cursor c = getContentResolver().query(QikPikContentProvider.CONTENT_URI,
                 new String[]{"image", "tags"}, "qikpicId=?", new String[]{oldOrNew}, null);
         c.moveToFirst();
-        String imgFile = /*"/data/data/com.tuts.vijay.qikpic/files/full/full_20150928_025528.jpg";*/c.getString(c.getColumnIndex("image"));
+        String imgFile = c.getString(c.getColumnIndex("image"));
         imageView.setImageURI(Uri.parse(imgFile));
         //load tags into list
         String tagStr = c.getString(c.getColumnIndex("tags"));
@@ -343,46 +346,13 @@ public class DetailActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.addTagIcon) {
-            getInputFromUser();
-        }
     }
 
-    private void getInputFromUser() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-        alert.setTitle("Tag");
-
-        final EditText input = new EditText(this);
-        alert.setView(input);
-
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String value = input.getText().toString();
-                addTagToList(value);
-            }
-        });
-
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
-        alert.show();
-   }
-
-    private void addTagToList(String tag) {
+    public void addTagToList(String tag) {
         if (tempTagList == null) {
             tempTagList = new ArrayList<String>();
         }
         tempTagList.add(tag);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                (int)DisplayUtils.fromDpToPx(this, 48));
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        TextView tagView = (TextView) inflater.inflate(R.layout.tag_view, null, false);
-        tagView.setText(tag);
-        tagPanel.addView(tagView, 0, lp);
         needsSave = true;
     }
 
@@ -504,4 +474,5 @@ public class DetailActivity extends Activity implements View.OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
     }
+
 }

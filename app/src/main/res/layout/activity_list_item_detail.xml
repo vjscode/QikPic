@@ -16,24 +16,4 @@
         android:padding="0dp"
         android:scaleType="fitCenter" />
 
-    <LinearLayout
-        android:layout_below="@id/imageDetail"
-        android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:layout_width="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp">
-
-        <ImageView
-            android:id="@+id/addTagIcon"
-            android:layout_height="32dp"
-            android:layout_marginLeft="10dp"
-            android:layout_width="32dp"
-            android:src="@drawable/add_icon" />
-
-        <com.tuts.vijay.qikpic.view.FlowLayout
-            android:id="@+id/taggingPanel"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"></com.tuts.vijay.qikpic.view.FlowLayout>
-    </LinearLayout>
 </RelativeLayout>
