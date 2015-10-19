@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,8 +17,12 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +46,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class FeedActivity extends Activity implements View.OnClickListener, QikPicListFragment.OnFragmentInteractionListener {
+public class FeedActivity extends Activity implements View.OnClickListener, QikPicListFragment.OnFragmentInteractionListener,
+        View.OnTouchListener {
 
     private static final int TAKE_PHOTO = 0;
     private static final int SHOW_PHOTO = 1;
@@ -62,6 +68,10 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
 
     TextView txtQikPikCount;
 
+    RelativeLayout layoutFeed;
+
+    SearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +90,8 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
         captureBtn = (ImageView) findViewById(R.id.capture);
         captureBtn.setOnClickListener(this);
         txtQikPikCount = (TextView) findViewById(R.id.qikpikCount);
+        layoutFeed = (RelativeLayout) findViewById(R.id.layout_feed);
+        layoutFeed.setOnTouchListener(this);
         //runQikPikCountQuery();
     }
 
@@ -108,7 +120,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
+        searchView =
                 (SearchView) menu.findItem(R.id.menu_search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
@@ -285,5 +297,36 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
         if (savedInstanceState.containsKey("picTimeStamp")) {
             mCurrentTimeStamp = savedInstanceState.getString("picTimeStamp");
         }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            if (checkFocusRec(searchView)) {
+                Rect rect = new Rect();
+                searchView.getGlobalVisibleRect(rect);
+                if (!rect.contains((int)motionEvent.getRawX(), (int)motionEvent.getRawY())) {
+                    searchView.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    searchView.setIconified(true);
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkFocusRec(View view) {
+        if (view.isFocused())
+            return true;
+
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                if (checkFocusRec(viewGroup.getChildAt(i)))
+                    return true;
+            }
+        }
+        return false;
     }
 }
