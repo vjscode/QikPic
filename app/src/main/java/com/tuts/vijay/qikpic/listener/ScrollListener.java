@@ -38,8 +38,8 @@ public class ScrollListener implements AbsListView.OnScrollListener {
         int l = visibleItemCount + firstVisibleItem;
         if (l >= totalItemCount && !isLoading) {
             isLoading = true;
-            Log.d("test", "loading data!!!");
-            new DownloadTask(context, this).execute(totalItemCount);
+            Log.d("test", "loading data!!!: " + l);
+            new DownloadTask(context, this).execute(l);
         }
     }
 

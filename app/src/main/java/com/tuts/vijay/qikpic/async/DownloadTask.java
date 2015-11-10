@@ -33,7 +33,7 @@ public class DownloadTask extends AsyncTask<Integer, Void, Void> {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("QikPik");
             query.whereEqualTo("user", ParseUser.getCurrentUser());
             query.setLimit(5);
-            query.addDescendingOrder("updatedAt");
+            query.addDescendingOrder("createdAt");
             query.setSkip(skip);
             List<ParseObject> parseObjects = query.find();
             for (ParseObject po : parseObjects) {

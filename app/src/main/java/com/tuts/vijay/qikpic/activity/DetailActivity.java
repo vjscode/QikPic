@@ -113,8 +113,36 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             float currentX = imageView.getScrollX();
             float currentY = imageView.getScrollY();
-            imageView.setScrollX((int) (currentX + distanceX));
-            imageView.setScrollY((int) (currentY + distanceY));
+            Log.d("test", "currentX: " + currentX + ", currentY: " + currentY
+                + ", distanceX: " + distanceX + ", distanceY: " + distanceY);
+
+            float magCurrentX;
+            float magCurrentY;
+            if (currentX < 0) {
+                magCurrentX = -1 * currentX;
+            } else {
+                magCurrentX = currentX;
+            }
+            if (currentY < 0) {
+                magCurrentY = -1 * currentY;
+            } else {
+                magCurrentY = currentY;
+            }
+            if (imageView.getScaleX() > 1.0f && imageView.getScaleY() > 1.0f) {
+                float qWidth = imageView.getWidth() / 4;
+                float qHeight = imageView.getHeight() / 4;
+                //currentX < 0 means we are close to left edge
+                //currentX > 0 means we are close to right edge
+                //distanceX > 0 means we are moving to the right
+                //distanceX < 0 means we are moving to the left
+
+                if ((currentX == 0) || (currentX < 0 && (magCurrentX < qWidth || distanceX > 0)) || (currentX > 0 && (magCurrentX < qWidth || distanceX < 0))) {
+                    imageView.setScrollX((int) (currentX + distanceX));
+                }
+                if ((currentY == 0) || (currentY < 0 && (magCurrentY < qHeight || distanceY > 0)) || (currentY > 0 && (magCurrentY < qHeight || distanceY < 0))) {
+                    imageView.setScrollY((int) (currentY + distanceY));
+                }
+            }
             return true;
         }
 
