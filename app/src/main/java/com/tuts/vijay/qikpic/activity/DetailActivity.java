@@ -43,8 +43,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -56,6 +58,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private String oldOrNew;
     private ImageView imageView;
     private FlowLayout tagPanel;
+    private TextView prettyTimeStamp;
     private Uri uri;
     private String timeStampForFileName;
     private List<String> tempTagList;
@@ -77,6 +80,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         setContentView(R.layout.activity_list_item_detail);
         imageView = (ImageView) findViewById(R.id.imageDetail);
         tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
+        prettyTimeStamp = (TextView) findViewById(R.id.prettyTimeStamp);
         oldOrNew = getIntent().getStringExtra("oldOrNew");
         setProgressBarIndeterminateVisibility(true);
         dimensions = new HashMap<String, String>();
@@ -303,6 +307,20 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         return values;
     }
 
+    private String getDisplayableTime(long timestamp) {
+        StringBuilder sb = new StringBuilder();
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+        sb.append(c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
+        sb.append(", ");
+        sb.append(c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
+        sb.append(" ");
+        sb.append(c.get(Calendar.DAY_OF_MONTH));
+        sb.append(", ");
+        sb.append(c.get(Calendar.YEAR));
+        return sb.toString();
+    }
+
     private String getTagListAsString() {
         if (tempTagList == null) {
             tempTagList = new ArrayList<String>();
@@ -333,10 +351,11 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private void loadImage() {
         //load image from db table
         Cursor c = getContentResolver().query(QikPikContentProvider.CONTENT_URI,
-                new String[]{"image", "tags"}, "qikpicId=?", new String[]{oldOrNew}, null);
+                new String[]{"image", "tags", "createdAt"}, "qikpicId=?", new String[]{oldOrNew}, null);
         c.moveToFirst();
         String imgFile = c.getString(c.getColumnIndex("image"));
         imageView.setImageURI(Uri.parse(imgFile));
+        prettyTimeStamp.setText(getDisplayableTime(Long.parseLong(c.getString(c.getColumnIndex("createdAt")))));
         //load tags into list
         String tagStr = c.getString(c.getColumnIndex("tags"));
         loadTags(tagStr);

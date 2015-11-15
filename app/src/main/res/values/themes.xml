@@ -2,7 +2,7 @@
 <resources>
     <!-- the theme applied to the application or activity -->
     <style name="ActionBarTheme"
-        parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/ActionBar</item>
     </style>
 
@@ -31,5 +31,16 @@
     <style name="TagDialogWindowAnimation">
         <item name="android:windowEnterAnimation">@anim/tag_dialog_in</item>
         <item name="android:windowExitAnimation">@anim/tag_dialog_out</item>
+    </style>
+
+    <style name="QikPicActionBarTheme"
+        parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <style name="MyActionBar"
+        parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/actionbar_background</item>
     </style>
 </resources>

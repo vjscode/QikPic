@@ -1,16 +1,16 @@
 package com.tuts.vijay.qikpic.activity;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 
-public class TagSearchActivity extends Activity {
+public class TagSearchActivity extends AppCompatActivity {
 
     QikPicGridFragment gridFragment;
     private String searchTag;
@@ -23,16 +23,16 @@ public class TagSearchActivity extends Activity {
     }
 
     private void initFragment(String q) {
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
 
         FragmentTransaction ft = fm.beginTransaction();
         gridFragment = new QikPicGridFragment();
         Bundle b = new Bundle();
         b.putBoolean("isSearch", true);
         b.putString("q", q);
-        getActionBar().setTitle(q);
+        getSupportActionBar().setTitle(q);
         gridFragment.setArguments(b);
-        ft.add(R.id.fragmentContainer, gridFragment);
+        ft.add(R.id.fragmentWrapper, gridFragment);
         ft.commit();
     }
 

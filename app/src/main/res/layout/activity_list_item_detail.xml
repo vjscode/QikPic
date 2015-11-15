@@ -16,4 +16,13 @@
         android:padding="0dp"
         android:scaleType="fitCenter" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/prettyTimeStamp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="10dp"
+        android:textColor="#FFFFFF"/>
+
 </RelativeLayout>

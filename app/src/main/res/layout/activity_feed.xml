@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layout_feed"
@@ -42,47 +43,33 @@
 
     </RelativeLayout>
 
-    <LinearLayout
+    <android.support.design.widget.TabLayout
+        android:id="@+id/sliding_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/uiswitcher"
-        android:gravity="center"
-        android:background="@drawable/ui_switcher_bkg"
-        android:layout_below="@id/profileChrome">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/grid_bkg"
-            android:id="@+id/grid_icon"
-            android:layout_margin="5dp"
-            android:layout_weight="1"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/list_bkg"
-            android:id="@+id/list_icon"
-            android:layout_margin="5dp"
-            android:layout_weight="1"/>
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_photo_camera_white_24dp"
-            android:id="@+id/capture"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_weight="1"/>
-    </LinearLayout>
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+        android:layout_below="@id/profileChrome"/>
 
-    <FrameLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/uiswitcher"
-        android:layout_marginTop="0dp"
-        android:id="@+id/fragmentContainer"
-        android:background="#FAFAFA">
+        android:layout_below="@id/sliding_tabs"
+        android:background="@android:color/white" />
 
-    </FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_photo_camera_white_24dp"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        app:backgroundTint="@color/material_deep_teal_500"
+        app:rippleColor="@color/abc_background_cache_hint_selector_material_dark"
+        app:pressedTranslationZ="12dp" />
 
 </RelativeLayout>

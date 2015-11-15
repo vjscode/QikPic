@@ -1,9 +1,6 @@
 package com.tuts.vijay.qikpic.activity;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +11,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
+import com.tuts.vijay.qikpic.adapter.FeedAdapter;
 import com.tuts.vijay.qikpic.async.UploadTask;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
@@ -46,7 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class FeedActivity extends Activity implements View.OnClickListener, QikPicListFragment.OnFragmentInteractionListener,
+public class FeedActivity extends AppCompatActivity implements View.OnClickListener, QikPicListFragment.OnFragmentInteractionListener,
         View.OnTouchListener {
 
     private static final int TAKE_PHOTO = 0;
@@ -57,11 +59,10 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
     private ImageView captureBtn;
     private ImageView gridIcon;
     private ImageView listIcon;
+    private FloatingActionButton fab;
 
     //Fragments
-    //PhotosGridFragment gridFragment;
     QikPicGridFragment gridFragment;
-    //PhotosListFragment listFragment;
     QikPicListFragment listFragment;
 
     Fragment currentFragment;
@@ -76,27 +77,36 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
-        getActionBar().setDisplayShowTitleEnabled(false);
-        getActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         initUI();
         initFragment();
     }
 
     private void initUI() {
-        gridIcon = (ImageView) findViewById(R.id.grid_icon);
-        gridIcon.setOnClickListener(this);
-        listIcon = (ImageView) findViewById(R.id.list_icon);
-        listIcon.setOnClickListener(this);
-        captureBtn = (ImageView) findViewById(R.id.capture);
-        captureBtn.setOnClickListener(this);
         txtQikPikCount = (TextView) findViewById(R.id.qikpikCount);
         layoutFeed = (RelativeLayout) findViewById(R.id.layout_feed);
         layoutFeed.setOnTouchListener(this);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new FeedAdapter(getSupportFragmentManager(),
+                FeedActivity.this));
+
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_grid_on_black_24dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_list_black_24dp);
+
         //runQikPikCountQuery();
     }
 
     private void initFragment() {
-        FragmentManager fm = getFragmentManager();
+        /*FragmentManager fm = getFragmentManager();
 
         int activePane = readActivePane();
         FragmentTransaction ft = fm.beginTransaction();
@@ -110,7 +120,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
             ft.add(R.id.fragmentContainer, listFragment);
             ft.commit();
             currentFragment = listFragment;
-        }
+        }*/
     }
 
     @Override
@@ -124,6 +134,7 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
                 (SearchView) menu.findItem(R.id.menu_search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -152,35 +163,8 @@ public class FeedActivity extends Activity implements View.OnClickListener, QikP
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.capture) {
+        if (view.getId() == R.id.fab) {
             startCamera();
-        } else if (view.getId() == R.id.list_icon) {
-            switchPanes(R.id.list_icon);
-        } else if (view.getId() == R.id.grid_icon) {
-            switchPanes(R.id.grid_icon);
-        }
-    }
-
-    private void switchPanes(int id) {
-        FragmentManager fm = getFragmentManager();
-        if (id == R.id.list_icon) {
-            FragmentTransaction ft = fm.beginTransaction();
-            if (listFragment == null) {
-                listFragment = new QikPicListFragment();
-            }
-            ft.replace(R.id.fragmentContainer, listFragment);
-            ft.commit();
-            currentFragment = listFragment;
-            saveActivePane(Constants.CONTAINER_LIST);
-        } else {
-            FragmentTransaction ft = fm.beginTransaction();
-            if (gridFragment == null) {
-                gridFragment = new QikPicGridFragment();
-            }
-            ft.replace(R.id.fragmentContainer, gridFragment);
-            ft.commit();
-            currentFragment = gridFragment;
-            saveActivePane(Constants.CONTAINER_GRID);
         }
     }
 

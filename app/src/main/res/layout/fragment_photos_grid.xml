@@ -16,7 +16,6 @@
     </ProgressBar>
 
     <GridView
-        android:layout_below="@id/capture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/gridView"
