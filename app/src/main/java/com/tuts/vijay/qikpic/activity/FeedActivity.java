@@ -38,6 +38,7 @@ import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.adapter.FeedAdapter;
+import com.tuts.vijay.qikpic.async.DiskResizeTask;
 import com.tuts.vijay.qikpic.async.UploadTask;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
@@ -259,6 +260,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         new UploadTask(this).execute();
+        new DiskResizeTask(this).execute();
     }
 
     @Override
