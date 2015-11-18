@@ -1,6 +1,8 @@
 package com.tuts.vijay.qikpic.activity;
 
+import android.app.AlarmManager;
 import android.app.Fragment;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +40,7 @@ import com.tuts.vijay.qikpic.ActivityInteraction;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.adapter.FeedAdapter;
-import com.tuts.vijay.qikpic.async.DiskResizeTask;
+import com.tuts.vijay.qikpic.async.DiskResizeIntentService;
 import com.tuts.vijay.qikpic.async.UploadTask;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
@@ -46,6 +48,7 @@ import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -55,6 +58,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     private static final int TAKE_PHOTO = 0;
     private static final int SHOW_PHOTO = 1;
     private static final String TAG = FeedActivity.class.getSimpleName();
+    private static final int DAY_IN_MS = 86400000;
 
     //UI
     private ImageView captureBtn;
@@ -82,6 +86,15 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         initUI();
         initFragment();
+        startResizeTimer();
+    }
+
+    private void startResizeTimer() {
+        Calendar cal = Calendar.getInstance();
+        Intent intent = new Intent(this, DiskResizeIntentService.class);
+        PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
+        AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis() + 10 * 1000 * 60, DAY_IN_MS, pintent);
     }
 
     private void initUI() {
@@ -260,7 +273,6 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         new UploadTask(this).execute();
-        new DiskResizeTask(this).execute();
     }
 
     @Override

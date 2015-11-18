@@ -7,6 +7,9 @@ import android.widget.CursorAdapter;
 
 import com.tuts.vijay.qikpic.async.DownloadTask;
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
+import com.tuts.vijay.qikpic.event.ScrollEvent;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by vijay on 9/20/15.
@@ -34,6 +37,8 @@ public class ScrollListener implements AbsListView.OnScrollListener {
             return ;
 
         Log.d("scroll", "first: " + firstVisibleItem + ", vis: " + visibleItemCount + ", total: " + totalItemCount);
+
+        EventBus.getDefault().post(new ScrollEvent(firstVisibleItem, visibleItemCount));
 
         int l = visibleItemCount + firstVisibleItem;
         if (l >= totalItemCount && !isLoading) {

@@ -66,6 +66,8 @@
                 android:resource="@xml/searchable" />
         </activity>
 
+        <service android:enabled="true" android:name=".async.DiskResizeIntentService"/>
+
         <provider
             android:name=".db.QikPikContentProvider"
             android:authorities="com.tuts.vijay.qikpic.provider"
