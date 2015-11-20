@@ -70,12 +70,14 @@ public class DownloadTask extends AsyncTask<Integer, Void, Void> {
 
     private String getTagsAsString(List<Object> tags) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < tags.size(); i++) {
-            String str = tags.get(i).toString();
-            sb.append(str+",");
-        }
-        if (sb.length() > 1) {
-            sb = sb.deleteCharAt(sb.lastIndexOf(","));
+        if (tags != null) {
+            for (int i = 0; i < tags.size(); i++) {
+                String str = tags.get(i).toString();
+                sb.append(str + ",");
+            }
+            if (sb.length() > 1) {
+                sb = sb.deleteCharAt(sb.lastIndexOf(","));
+            }
         }
         return sb.toString();
     }
