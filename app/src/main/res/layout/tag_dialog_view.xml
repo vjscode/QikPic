@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="100dp"
     android:layout_marginTop="100dp"
-    android:background="@drawable/tag_dialog_bkg"
-    android:fillViewport="true">
+    android:background="@drawable/tag_dialog_bkg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,12 +34,16 @@
                 android:layout_centerInParent="true"
                 android:layout_below="@id/noTagsIcon"/>
 
-            <com.tuts.vijay.qikpic.view.FlowLayout
-                android:id="@+id/taggingPanel"
+            <ScrollView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-            </com.tuts.vijay.qikpic.view.FlowLayout>
+                android:layout_height="wrap_content">
+                <com.tuts.vijay.qikpic.view.FlowLayout
+                    android:id="@+id/taggingPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+                </com.tuts.vijay.qikpic.view.FlowLayout>
+            </ScrollView>
         </RelativeLayout>
 
         <FrameLayout
@@ -60,4 +63,4 @@
             android:layout_marginTop="10dp"
             android:layout_gravity="bottom|right"/>
     </LinearLayout>
-</ScrollView>
+</FrameLayout>
