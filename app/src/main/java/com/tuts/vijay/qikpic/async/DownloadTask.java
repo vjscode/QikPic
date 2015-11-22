@@ -65,6 +65,8 @@ public class DownloadTask extends AsyncTask<Integer, Void, Void> {
         values.put("thumbnail", filePaths[1]);
         values.put("draft", 0);
         values.put("qikpicId", po.getString("qikpicId"));
+        values.put("lat", po.getString("lat"));
+        values.put("lng", po.getString("lng"));
         return values;
     }
 

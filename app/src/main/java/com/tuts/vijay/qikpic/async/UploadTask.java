@@ -36,7 +36,7 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         //android.net.Uri uri, java.lang.String[] projection, java.lang.String selection, java.lang.String[] selectionArgs, java.lang.String sortOrder
         Cursor c = context.getContentResolver().query(QikPikContentProvider.CONTENT_URI,
-                new String[]{"objectId", "qikpicId", "image", "userId", "createdAt", "updatedAt", "tags", "thumbnail"}, "draft=?", new String[]{"1"}, "updatedAt DESC");
+                new String[]{"objectId", "qikpicId", "image", "userId", "createdAt", "updatedAt", "tags", "thumbnail", "lat", "lng"}, "draft=?", new String[]{"1"}, "updatedAt DESC");
         while (c.moveToNext()) {
             String objectId = c.getString(c.getColumnIndex("objectId"));
             if (objectId == null) {
@@ -48,7 +48,9 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
                         c.getString(c.getColumnIndex("createdAt")),
                         c.getString(c.getColumnIndex("updatedAt")),
                         c.getString(c.getColumnIndex("tags")),
-                        c.getString(c.getColumnIndex("thumbnail")));
+                        c.getString(c.getColumnIndex("thumbnail")),
+                        c.getString(c.getColumnIndex("lat")),
+                        c.getString(c.getColumnIndex("lng")));
             } else {
                 ParseQuery<ParseObject> pq = ParseQuery.getQuery("QikPik");
                 pq.whereEqualTo("objectId", objectId);
@@ -78,7 +80,7 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void makeParseObject(String objectId, String qikpicId, String image, String userId, String createdAt,
-                                 String updateAt, String tags, String thumbnail) {
+                                 String updateAt, String tags, String thumbnail, String lat, String lng) {
         try {
             //read image file
             File imageFile = new File(image);
@@ -106,6 +108,9 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
             po.put("updated", Long.valueOf(updateAt));
             po.put("tags", loadTags(tags));
             po.put("thumbnail", thumbnailPFile);
+            po.put("lat", lat);
+            po.put("lng", lng);
+
             po.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {

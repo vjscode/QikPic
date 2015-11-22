@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -71,7 +72,8 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private GestureDetector gestureDetector;
     private boolean mScrollable = false;
     private boolean listenForScaling = true;
-    ScaleGestureDetector mScaleDetector;
+    private ScaleGestureDetector mScaleDetector;
+    private Location mCurrentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             Log.d("test", "timeStampForFileName:>> " + timeStampForFileName);
             Bitmap bmp = setBitmapFromUri();
             loadImageFromBitmap(bmp);
+            mCurrentLocation = getIntent().getParcelableExtra("location");
         }
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -238,7 +241,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private void createAndShowTagDialog() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.tag_dialog_in, R.anim.tag_dialog_out);
-        QikPicTagsFragment dialogFragment = new QikPicTagsFragment (this);
+        QikPicTagsFragment dialogFragment = new QikPicTagsFragment (this, mCurrentLocation);
         ((QikPicTagsFragment)dialogFragment).setTags(tempTagList);
         dialogFragment.show(ft, "Tag Fragment");
     }
@@ -304,6 +307,11 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         values.put("thumbnail", getFilesDir() + "/thumbnail/thumbnail_" + timeStampForFileName + ".jpg");
         values.put("draft", 1);
         values.put("qikpicId", timeStampForFileName);
+        if (mCurrentLocation != null) {
+            values.put("lat", mCurrentLocation.getLatitude());
+            values.put("lng", mCurrentLocation.getLongitude());
+        }
+
         return values;
     }
 
@@ -351,7 +359,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private void loadImage() {
         //load image from db table
         Cursor c = getContentResolver().query(QikPikContentProvider.CONTENT_URI,
-                new String[]{"image", "tags", "createdAt"}, "qikpicId=?", new String[]{oldOrNew}, null);
+                new String[]{"image", "tags", "createdAt", "lat", "lng"}, "qikpicId=?", new String[]{oldOrNew}, null);
         c.moveToFirst();
         String imgFile = c.getString(c.getColumnIndex("image"));
         imageView.setImageURI(Uri.parse(imgFile));
@@ -359,6 +367,15 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         //load tags into list
         String tagStr = c.getString(c.getColumnIndex("tags"));
         loadTags(tagStr);
+        loadLocation(c.getString(c.getColumnIndex("lat")), c.getString(c.getColumnIndex("lng")));
+    }
+
+    private void loadLocation(String lat, String lng) {
+        mCurrentLocation = new Location("");
+        if (lat != null && lng != null) {
+            mCurrentLocation.setLatitude(Double.parseDouble(lat));
+            mCurrentLocation.setLongitude(Double.parseDouble(lng));
+        }
     }
 
     private void loadTags(String tagStr) {

@@ -3,9 +3,11 @@ package com.tuts.vijay.qikpic.fragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,33 +15,47 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
 import com.tuts.vijay.qikpic.activity.DetailActivity;
 import com.tuts.vijay.qikpic.listener.TagListener;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by vijay on 10/14/15.
  */
-public class QikPicTagsFragment extends DialogFragment {
+public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCallback {
 
     private List<String> tags;
     private TagListener tagListener;
     private FlowLayout taggingPanel;
-    private ImageView addImgTag;
+    private TextView addTag;
+    private QikPicMapFragment mapFragment;
+    private Location mLocation;
+    private View rootView;
 
     public QikPicTagsFragment() {
     }
 
-    public QikPicTagsFragment(TagListener tagListener) {
+    private void createMap() {
+        mapFragment = new QikPicMapFragment();
+    }
+
+    public QikPicTagsFragment(TagListener tagListener, Location location) {
         this.tagListener = tagListener;
+        this.mLocation = location;
+        createMap();
     }
 
     @Override
@@ -51,16 +67,31 @@ public class QikPicTagsFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.tag_dialog_view, container, false);
+        this.rootView = inflater.inflate(R.layout.tag_dialog_view, container, false);
         taggingPanel = (FlowLayout) rootView.findViewById(R.id.taggingPanel);
-        addImgTag = (ImageView) rootView.findViewById(R.id.addTagIcon);
-        addImgTag.setOnClickListener(new View.OnClickListener() {
+        addTag = (TextView) rootView.findViewById(R.id.addTagIcon);
+        addTag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getInputFromUser();
             }
         });
+        setTagViews();
+
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.add(R.id.mapContainer, mapFragment);
+        ft.commit();
+        mapFragment.getMapAsync(this);
+
         return rootView;
+    }
+
+    private void setTagViews() {
+        if (tags != null && tags.size() > 0) {
+            rootView.findViewById(R.id.noTagsIcon).setVisibility(View.GONE);
+            rootView.findViewById(R.id.noTagsText).setVisibility(View.GONE);
+            taggingPanel.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -118,8 +149,15 @@ public class QikPicTagsFragment extends DialogFragment {
     }
 
     private void addTagToList(String tag) {
-        addTagView(tag);
-        ((DetailActivity)getActivity()).addTagToList(tag);
+        if (tag != null && tag.length() > 0) {
+            if (tags == null) {
+                tags = new ArrayList<>();
+            }
+            tags.add(0, tag);
+            setTagViews();
+            addTagView(tag);
+            ((DetailActivity)getActivity()).addTagToList(tag);
+        }
     }
 
     private void addTagView(String tag) {
@@ -130,5 +168,16 @@ public class QikPicTagsFragment extends DialogFragment {
         TextView tagView = (TextView) inflater.inflate(R.layout.tag_view, null, false);
         tagView.setText(tag);
         taggingPanel.addView(tagView, 0, lp);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        if (mLocation != null) {
+            LatLng latLng = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+            googleMap.setMyLocationEnabled(true);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+            googleMap.addMarker(new MarkerOptions()
+                    .position(latLng));
+        }
     }
 }

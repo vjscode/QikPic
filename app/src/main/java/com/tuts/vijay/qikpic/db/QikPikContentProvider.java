@@ -60,7 +60,9 @@ public class QikPikContentProvider extends ContentProvider {
                     " tags TEXT, " +
                     " thumbnail TEXT NOT NULL," +
                     " draft integer," +
-                    " qikpicId TEXT unique" +
+                    " qikpicId TEXT unique," +
+                    " lat TEXT," +
+                    " lng TEXT" +
                     ");";
 
     /**

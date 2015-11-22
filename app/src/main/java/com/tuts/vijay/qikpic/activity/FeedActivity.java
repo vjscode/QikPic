@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +31,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.parse.CountCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
@@ -42,14 +45,18 @@ import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.adapter.FeedAdapter;
 import com.tuts.vijay.qikpic.async.DiskResizeIntentService;
 import com.tuts.vijay.qikpic.async.UploadTask;
+import com.tuts.vijay.qikpic.event.LocationEvent;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
+import com.tuts.vijay.qikpic.listener.GMSConnectionListener;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import de.greenrobot.event.EventBus;
 
 
 public class FeedActivity extends AppCompatActivity implements View.OnClickListener, QikPicListFragment.OnFragmentInteractionListener,
@@ -69,14 +76,17 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     //Fragments
     QikPicGridFragment gridFragment;
     QikPicListFragment listFragment;
-
     Fragment currentFragment;
 
+    //UI
     TextView txtQikPikCount;
-
     RelativeLayout layoutFeed;
-
     SearchView searchView;
+
+    //Location
+    protected GoogleApiClient mGoogleApiClient;
+    protected Location mLastLocation;
+    private GMSConnectionListener mConnectionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +97,19 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         initUI();
         initFragment();
         startResizeTimer();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+        buildGoogleApiClientAndSubscribe();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     private void startResizeTimer() {
@@ -234,6 +257,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("test", "feed uri:>> " + mCurrentTimeStamp);
         i.putExtra("uri", mCurrentPhotoUri);
         i.putExtra("thumbnailname", mCurrentTimeStamp);
+        i.putExtra("location", mLastLocation);
         startActivityForResult(i, SHOW_PHOTO);
     }
 
@@ -272,7 +296,16 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        mGoogleApiClient.connect();
         new UploadTask(this).execute();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
@@ -326,5 +359,19 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         return false;
+    }
+
+    protected synchronized void buildGoogleApiClientAndSubscribe() {
+        mConnectionListener = new GMSConnectionListener();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(mConnectionListener)
+                .addOnConnectionFailedListener(mConnectionListener)
+                .addApi(LocationServices.API)
+                .build();
+        mConnectionListener.setmGoogleApiClient(mGoogleApiClient);
+    }
+
+    public void onEvent(LocationEvent event) {
+        mLastLocation = event.loc;
     }
 }

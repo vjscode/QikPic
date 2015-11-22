@@ -7,33 +7,57 @@
     android:background="@drawable/tag_dialog_bkg"
     android:fillViewport="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="10dp"
+        android:orientation="vertical">
 
-        android:padding="10dp">
-
-        <com.tuts.vijay.qikpic.view.FlowLayout
-            android:id="@+id/taggingPanel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="10dp"></com.tuts.vijay.qikpic.view.FlowLayout>
-
-        <Button
-            android:id="@+id/dismiss"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dismiss"
-            android:visibility="gone" />
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1">
 
-        <ImageView
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/tag"
+                android:id="@+id/noTagsIcon"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/noTagsText"
+                android:text="No tags yet"
+                android:layout_margin="2dp"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/noTagsIcon"/>
+
+            <com.tuts.vijay.qikpic.view.FlowLayout
+                android:id="@+id/taggingPanel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+            </com.tuts.vijay.qikpic.view.FlowLayout>
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/mapContainer">
+        </FrameLayout>
+
+        <TextView
             android:id="@+id/addTagIcon"
-            android:layout_height="32dp"
-            android:layout_marginLeft="10dp"
-            android:layout_width="32dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/add_icon" />
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:padding="5dp"
+            android:text="Add Tag"
+            android:background="#000000"
+            android:textColor="#ffffff"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="bottom|right"/>
+    </LinearLayout>
 </ScrollView>
