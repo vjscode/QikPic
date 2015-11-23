@@ -29,7 +29,6 @@ import com.tuts.vijay.qikpic.activity.DetailActivity;
 import com.tuts.vijay.qikpic.listener.TagListener;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,6 +43,7 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
     private QikPicMapFragment mapFragment;
     private Location mLocation;
     private View rootView;
+    private boolean showTags = false;
 
     public QikPicTagsFragment() {
     }
@@ -87,7 +87,7 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
     }
 
     private void setTagViews() {
-        if (tags != null && tags.size() > 0) {
+        if (showTags) {
             rootView.findViewById(R.id.noTagsIcon).setVisibility(View.GONE);
             rootView.findViewById(R.id.noTagsText).setVisibility(View.GONE);
             taggingPanel.setVisibility(View.VISIBLE);
@@ -114,6 +114,9 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+        if (tags != null && tags.size() > 0) {
+            showTags = true;
+        }
     }
 
     private void loadTags() {
@@ -150,10 +153,7 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
 
     private void addTagToList(String tag) {
         if (tag != null && tag.length() > 0) {
-            if (tags == null) {
-                tags = new ArrayList<>();
-            }
-            tags.add(0, tag);
+            showTags = true;
             setTagViews();
             addTagView(tag);
             ((DetailActivity)getActivity()).addTagToList(tag);
