@@ -317,6 +317,9 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         if (mCurrentTimeStamp != null) {
             outState.putString("picTimeStamp", mCurrentTimeStamp);
         }
+        if (mLastLocation != null) {
+            outState.putParcelable("lastLoc", mLastLocation);
+        }
     }
 
     @Override
@@ -327,6 +330,9 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (savedInstanceState.containsKey("picTimeStamp")) {
             mCurrentTimeStamp = savedInstanceState.getString("picTimeStamp");
+        }
+        if (savedInstanceState.containsKey("lastLoc")) {
+            mLastLocation = savedInstanceState.getParcelable("lastLoc");
         }
     }
 

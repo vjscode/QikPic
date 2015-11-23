@@ -108,9 +108,10 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
             po.put("updated", Long.valueOf(updateAt));
             po.put("tags", loadTags(tags));
             po.put("thumbnail", thumbnailPFile);
-            po.put("lat", lat);
-            po.put("lng", lng);
-
+            if (lat != null && lng != null) {
+                po.put("lat", lat);
+                po.put("lng", lng);
+            }
             po.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
