@@ -3,21 +3,34 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion '23.0.1'
+    signingConfigs {
+        config1 {
+            keyAlias ''
+            keyPassword ''
+            storeFile file('')
+            storePassword ''
+        }
+    }
     defaultConfig {
         applicationId 'com.tuts.vijay.qikpic'
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 2
-        versionName '1.1'
+        versionCode 3
+        versionName '2.0'
     }
     buildTypes {
         release {
             minifyEnabled false
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config1
         }
     }
     productFlavors {
+    }
+    lintOptions {
+        checkReleaseBuilds true
+        abortOnError false
     }
 }
 
