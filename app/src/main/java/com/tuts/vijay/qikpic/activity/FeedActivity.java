@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.location.Location;
@@ -64,6 +65,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int TAKE_PHOTO = 0;
     private static final int SHOW_PHOTO = 1;
+    private static final int PICK_PHOTO = 2;
     private static final String TAG = FeedActivity.class.getSimpleName();
     private static final int DAY_IN_MS = 86400000;
 
@@ -71,7 +73,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView captureBtn;
     private ImageView gridIcon;
     private ImageView listIcon;
-    private FloatingActionButton fab;
+    private FloatingActionButton anchorFab;
 
     //Fragments
     QikPicGridFragment gridFragment;
@@ -82,6 +84,8 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     TextView txtQikPikCount;
     RelativeLayout layoutFeed;
     SearchView searchView;
+    FloatingActionButton fabGallery;
+    FloatingActionButton fabCamera;
 
     //Location
     protected GoogleApiClient mGoogleApiClient;
@@ -124,8 +128,12 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         txtQikPikCount = (TextView) findViewById(R.id.qikpikCount);
         layoutFeed = (RelativeLayout) findViewById(R.id.layout_feed);
         layoutFeed.setOnTouchListener(this);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(this);
+        anchorFab = (FloatingActionButton) findViewById(R.id.fab);
+        anchorFab.setOnClickListener(this);
+        fabCamera = (FloatingActionButton) findViewById(R.id.fabCamera);
+        fabCamera.setOnClickListener(this);
+        fabGallery = (FloatingActionButton) findViewById(R.id.fabGallery);
+        fabGallery.setOnClickListener(this);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(new FeedAdapter(getSupportFragmentManager(),
@@ -201,7 +209,27 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab) {
+            if (fabCamera.getVisibility() == View.GONE) {
+                fabVisibility(View.VISIBLE);
+            } else {
+                fabVisibility(View.GONE);
+            }
+        } else if (view.getId() == R.id.fabCamera) {
             startCamera();
+            fabVisibility(View.GONE);
+        } else if (view.getId() == R.id.fabGallery) {
+            dispatchPickPictureIntent();
+            fabVisibility(View.GONE);
+        }
+    }
+
+    private void fabVisibility(int vis) {
+        fabGallery.setVisibility(vis);
+        fabCamera.setVisibility(vis);
+        if (vis == View.GONE) {
+            anchorFab.setImageResource(R.drawable.ic_photo_camera_white_24dp);
+        } else {
+            anchorFab.setImageResource(R.drawable.ic_highlight_off_white_24dp);
         }
     }
 
@@ -240,24 +268,65 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         startActivityForResult(takePictureIntent, TAKE_PHOTO);
     }
 
+    private void dispatchPickPictureIntent() {
+        Intent i = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, PICK_PHOTO);
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap bmp;
         if (requestCode == TAKE_PHOTO && resultCode == RESULT_OK) {
-            startActivityForTagging();
+            startActivityForTagging(true, null);
         } else if (requestCode == SHOW_PHOTO && resultCode == RESULT_OK) {
             ((ActivityInteraction)currentFragment).loadObjects();
             runQikPikCountQuery();
+        } else if (requestCode == PICK_PHOTO && resultCode == RESULT_OK) {
+            Log.d("test", "data: " + data);
+            Uri uri = data.getData();
+            Log.d("test", "uri: " + uri);
+
+            String[] filePathColumn = { MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.DATE_TAKEN,
+                    MediaStore.Images.ImageColumns.LATITUDE, MediaStore.Images.ImageColumns.LONGITUDE};
+            Cursor cursor = getContentResolver().query(uri,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columndataIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columndataIndex);
+            Log.d("test", "picturePath: " + picturePath);
+            mCurrentPhotoUri = uri;
+
+            int columndateIndex = cursor.getColumnIndex(filePathColumn[1]);
+            long datePic = cursor.getLong(columndateIndex);
+            Log.d("test", "date: " + datePic);
+            mCurrentTimeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(datePic));
+
+            int columnlatIndex = cursor.getColumnIndex(filePathColumn[2]);
+            double latPic = cursor.getDouble(columnlatIndex);
+            Log.d("test", "date: " + latPic);
+
+            int columnlngIndex = cursor.getColumnIndex(filePathColumn[3]);
+            double lngPic = cursor.getDouble(columnlngIndex);
+            Log.d("test", "date: " + lngPic);
+            cursor.close();
+            mLastLocation = new Location("");
+            mLastLocation.setLatitude(latPic);
+            mLastLocation.setLongitude(latPic);
+            startActivityForTagging(false, picturePath);
         }
     }
 
-    private void startActivityForTagging() {
+    private void startActivityForTagging(boolean fromCamera, String picturePath) {
         Intent i = new Intent(this, DetailActivity.class);
         i.putExtra("oldOrNew", "new");
         Log.d("test", "feed uri:>> " + mCurrentTimeStamp);
         i.putExtra("uri", mCurrentPhotoUri);
         i.putExtra("thumbnailname", mCurrentTimeStamp);
         i.putExtra("location", mLastLocation);
+        i.putExtra("fromCamera", fromCamera);
+        i.putExtra("picturePath", picturePath);
         startActivityForResult(i, SHOW_PHOTO);
     }
 

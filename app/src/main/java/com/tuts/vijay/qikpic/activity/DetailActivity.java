@@ -14,6 +14,7 @@ import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -74,6 +75,8 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private boolean listenForScaling = true;
     private ScaleGestureDetector mScaleDetector;
     private Location mCurrentLocation;
+    private boolean fromCamera = false;
+    private String picturePathInGallery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,10 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
         prettyTimeStamp = (TextView) findViewById(R.id.prettyTimeStamp);
         oldOrNew = getIntent().getStringExtra("oldOrNew");
+        fromCamera = getIntent().getBooleanExtra("fromCamera", false);
+        if (!fromCamera) {
+            picturePathInGallery = getIntent().getStringExtra("picturePath");
+        }
         setProgressBarIndeterminateVisibility(true);
         dimensions = new HashMap<String, String>();
         gestureDetector = new GestureDetector(this, new GestureListener());
@@ -531,7 +538,12 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     }
 
     private void removeFileFromDisk() {
-        Log.d("test", "deleted? " + new File(uri.getPath()).delete());
+        if (fromCamera) {
+            Log.d(TAG, "deleted? " + new File(uri.getPath()).delete());
+        } else {
+            Log.d(TAG, "delete? " + getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Images.ImageColumns.DATA + "=?" , new String[]{ picturePathInGallery }));
+        }
     }
 
     @Override
