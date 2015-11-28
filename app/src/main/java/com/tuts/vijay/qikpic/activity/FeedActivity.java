@@ -7,7 +7,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.location.Location;
@@ -45,8 +44,10 @@ import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.adapter.FeedAdapter;
 import com.tuts.vijay.qikpic.async.DiskResizeIntentService;
+import com.tuts.vijay.qikpic.async.LoadPicFromMediaStoreTask;
 import com.tuts.vijay.qikpic.async.UploadTask;
 import com.tuts.vijay.qikpic.event.LocationEvent;
+import com.tuts.vijay.qikpic.event.MediaStorePicEvent;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
 import com.tuts.vijay.qikpic.listener.GMSConnectionListener;
@@ -286,35 +287,8 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("test", "data: " + data);
             Uri uri = data.getData();
             Log.d("test", "uri: " + uri);
-
-            String[] filePathColumn = { MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.DATE_TAKEN,
-                    MediaStore.Images.ImageColumns.LATITUDE, MediaStore.Images.ImageColumns.LONGITUDE};
-            Cursor cursor = getContentResolver().query(uri,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columndataIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columndataIndex);
-            Log.d("test", "picturePath: " + picturePath);
             mCurrentPhotoUri = uri;
-
-            int columndateIndex = cursor.getColumnIndex(filePathColumn[1]);
-            long datePic = cursor.getLong(columndateIndex);
-            Log.d("test", "date: " + datePic);
-            mCurrentTimeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date(datePic));
-
-            int columnlatIndex = cursor.getColumnIndex(filePathColumn[2]);
-            double latPic = cursor.getDouble(columnlatIndex);
-            Log.d("test", "date: " + latPic);
-
-            int columnlngIndex = cursor.getColumnIndex(filePathColumn[3]);
-            double lngPic = cursor.getDouble(columnlngIndex);
-            Log.d("test", "date: " + lngPic);
-            cursor.close();
-            mLastLocation = new Location("");
-            mLastLocation.setLatitude(latPic);
-            mLastLocation.setLongitude(latPic);
-            startActivityForTagging(false, picturePath);
+            new LoadPicFromMediaStoreTask(this).execute(uri);
         }
     }
 
@@ -448,5 +422,11 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onEvent(LocationEvent event) {
         mLastLocation = event.loc;
+    }
+
+    public void onEvent(MediaStorePicEvent picEvent) {
+        mCurrentTimeStamp = picEvent.timeStamp;
+        mLastLocation = picEvent.photoLocation;
+        startActivityForTagging(false, picEvent.picturePath);
     }
 }
