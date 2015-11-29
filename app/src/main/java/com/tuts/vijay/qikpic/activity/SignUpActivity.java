@@ -1,9 +1,12 @@
 package com.tuts.vijay.qikpic.activity;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -12,6 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.common.AccountPicker;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -21,6 +26,8 @@ import com.tuts.vijay.qikpic.R;
  * Activity which displays a login screen to the user.
  */
 public class SignUpActivity extends Activity {
+    private static final int REQUEST_CODE_EMAIL = 1;
+    private static final String TAG = SignUpActivity.class.getSimpleName();;
     // UI references.
     private EditText usernameEditText;
     private EditText passwordEditText;
@@ -56,6 +63,17 @@ public class SignUpActivity extends Activity {
                 signup();
             }
         });
+        populateEmailIfPossible();
+    }
+
+    private void populateEmailIfPossible() {
+        try {
+            Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                    new String[] { GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE }, false, null, null, null, null);
+            startActivityForResult(intent, REQUEST_CODE_EMAIL);
+        } catch (ActivityNotFoundException e) {
+            Log.d(TAG, "Get account did not work. Move on");
+        }
     }
 
     private void signup() {
@@ -116,5 +134,13 @@ public class SignUpActivity extends Activity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_EMAIL && resultCode == RESULT_OK) {
+            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            usernameEditText.setText(accountName);
+        }
     }
 }

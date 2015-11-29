@@ -5,7 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_logout">Logout</string>
     <string name="login">Login</string>
-    <string name="prompt_password">password</string>
+    <string name="prompt_password">qikpic password</string>
     <string name="prompt_username">email</string>
     <string name="error_intro">error intro</string>
     <string name="error_blank_username">blank username</string>
@@ -17,7 +17,7 @@
     <string name="title_activity_dispatch">DispatchActivity</string>
     <string name="title_activity_sign_up">SignUpActivity</string>
     <string name="signup">Signup</string>
-    <string name="prompt_password_again">password</string>
+    <string name="prompt_password_again">qikpic password</string>
     <string name="progress_signup">progress sign up</string>
     <string name="error_mismatched_passwords">mismatch password</string>
     <string name="title_activity_new_user">NewUserActivity</string>
