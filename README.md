@@ -23,3 +23,8 @@ When you take photos of your meeting whiteboards, grocery lists, receipts, parki
   - Add location, map views for the qikpics
   - App available for offline use
   - Improved infinite scrolling
+
+# Version 2.1
+  - Add pic from Gallery to QikPic feature
+  - Expanding floating actions
+  - Integrate Google account picker
