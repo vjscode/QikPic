@@ -8,10 +8,13 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.tuts.vijay.qikpic.application.QikPicApplication;
 import com.tuts.vijay.qikpic.event.MediaStorePicEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.inject.Inject;
 
 import de.greenrobot.event.EventBus;
 
@@ -20,11 +23,11 @@ import de.greenrobot.event.EventBus;
  */
 public class LoadPicFromMediaStoreTask extends AsyncTask<Uri, Void, Cursor> {
 
-    private Context mContext;
+    @Inject Context mContext;
     private String[] filePathColumn = { MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.DATE_TAKEN,
             MediaStore.Images.ImageColumns.LATITUDE, MediaStore.Images.ImageColumns.LONGITUDE};
-    public LoadPicFromMediaStoreTask(Context context) {
-        this.mContext = context;
+    public LoadPicFromMediaStoreTask() {
+        QikPicApplication.getAppContextComponent().inject(this);
     }
 
     @Override

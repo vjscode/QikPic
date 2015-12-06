@@ -340,7 +340,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
-        new UploadTask(this).execute();
+        new UploadTask().execute();
     }
 
     @Override

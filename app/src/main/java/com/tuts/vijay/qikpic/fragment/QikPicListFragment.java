@@ -123,7 +123,7 @@ public class QikPicListFragment extends Fragment implements ActivityInteraction,
         cusrsorAdapter = new QikPicCursorAdapter(getActivity(), R.layout.adapter_list_item,
                 null, dataColumns, viewIDs, 0);
         cusrsorAdapter.setType(1);
-        mListView.setOnScrollListener(new ScrollListener(cusrsorAdapter, dataProvider, getActivity()));
+        mListView.setOnScrollListener(new ScrollListener(cusrsorAdapter, dataProvider));
         mListView.setAdapter(cusrsorAdapter);
         mCallbacks = this;
         LoaderManager lm = getLoaderManager();

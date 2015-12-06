@@ -9,6 +9,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.tuts.vijay.qikpic.application.QikPicApplication;
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
 import com.tuts.vijay.qikpic.listener.ScrollListener;
 
@@ -16,16 +17,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by vijay on 9/20/15.
  */
 public class DownloadTask extends AsyncTask<Integer, Void, Void> {
 
-    Context context;
+    @Inject Context context;
     ScrollListener listener;
-    public DownloadTask(Context context, ScrollListener listener) {
+    public DownloadTask(ScrollListener listener) {
         this.listener = listener;
-        this.context = context;
+        QikPicApplication.getAppContextComponent().inject(this);
     }
 
     public void fetch(int skip) {
@@ -93,7 +96,7 @@ public class DownloadTask extends AsyncTask<Integer, Void, Void> {
     private String[] saveFiles(ParseObject po) {
         String[] result = new String[2];
         try {
-            Context c = context.getApplicationContext();
+            Context c = context;
             String filesPath = c.getFilesDir().getPath();
             File full = new File(filesPath, "full");
             if (!full.exists()) {

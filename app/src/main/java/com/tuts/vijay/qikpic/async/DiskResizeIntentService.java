@@ -3,7 +3,6 @@ package com.tuts.vijay.qikpic.async;
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
 import com.tuts.vijay.qikpic.event.ScrollEvent;
@@ -21,20 +20,15 @@ public class DiskResizeIntentService extends IntentService {
     public DiskResizeIntentService() {
         super("DiskResizeIntentService");
         EventBus.getDefault().register(this);
-        Log.d("test", "one");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Log.d("test", "two");
-
         //Dont resize when user is actively engaging with qikpics
         if (firstVisiblePos + numberOfVisItems >= 100) {
             return;
         }
-
-        Log.d("test", "three");
 
         Cursor c = getContentResolver().query(QikPikContentProvider.CONTENT_URI,
                 new String[]{"_id", "objectId", "qikpicId", "createdAt", "updatedAt"}, "draft=?", new String[]{"0"}, "updatedAt ASC");
@@ -43,7 +37,6 @@ public class DiskResizeIntentService extends IntentService {
 
         //check count > 100
         if (count < 100) {
-            Log.d("test", "four");
             return;
         }
 

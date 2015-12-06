@@ -1,6 +1,5 @@
 package com.tuts.vijay.qikpic.listener;
 
-import android.content.Context;
 import android.util.Log;
 import android.widget.AbsListView;
 import android.widget.CursorAdapter;
@@ -16,12 +15,10 @@ import de.greenrobot.event.EventBus;
  */
 public class ScrollListener implements AbsListView.OnScrollListener {
     CursorAdapter adapter;
-    Context context;
     boolean isLoading = false;
 
-    public ScrollListener(CursorAdapter adapter, QikPikContentProvider provider, Context context) {
+    public ScrollListener(CursorAdapter adapter, QikPikContentProvider provider) {
         this.adapter = adapter;
-        this.context = context;
     }
 
     @Override
@@ -44,7 +41,7 @@ public class ScrollListener implements AbsListView.OnScrollListener {
         if (l >= totalItemCount && !isLoading) {
             isLoading = true;
             Log.d("test", "loading data!!!: " + l);
-            new DownloadTask(context, this).execute(l);
+            new DownloadTask(this).execute(l);
         }
     }
 

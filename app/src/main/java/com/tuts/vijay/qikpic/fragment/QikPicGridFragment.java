@@ -58,7 +58,7 @@ public class QikPicGridFragment extends Fragment implements LoaderManager.Loader
         cusrsorAdapter = new QikPicCursorAdapter(getActivity(), R.layout.adapter_grid_item,
                 null, dataColumns, viewIDs, 0);
         cusrsorAdapter.setType(0);
-        mGridView.setOnScrollListener(new ScrollListener(cusrsorAdapter, dataProvider, getActivity()));
+        mGridView.setOnScrollListener(new ScrollListener(cusrsorAdapter, dataProvider));
         mGridView.setAdapter(cusrsorAdapter);
         mCallbacks = this;
         LoaderManager lm = getLoaderManager();

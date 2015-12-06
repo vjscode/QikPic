@@ -12,6 +12,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.tuts.vijay.qikpic.application.QikPicApplication;
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
 
 import org.apache.commons.io.IOUtils;
@@ -22,14 +23,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by vijay on 10/8/15.
  */
 public class UploadTask extends AsyncTask<Void, Void, Void> {
 
-    private Context context;
-    public UploadTask(Context context) {
-        this.context = context;
+    @Inject Context context;
+    public UploadTask() {
+        QikPicApplication.getAppContextComponent().inject(this);
     }
 
     @Override
