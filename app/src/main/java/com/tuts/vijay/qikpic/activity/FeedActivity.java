@@ -288,7 +288,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
             Uri uri = data.getData();
             Log.d("test", "uri: " + uri);
             mCurrentPhotoUri = uri;
-            new LoadPicFromMediaStoreTask(this).execute(uri);
+            new LoadPicFromMediaStoreTask().execute(uri);
         }
     }
 
