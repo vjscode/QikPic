@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 22
     buildToolsVersion '23.0.1'
     defaultConfig {
         applicationId 'com.tuts.vijay.qikpic'
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 4
         versionName '2.1'
     }
@@ -18,11 +18,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    //compileOptions {
+      //  sourceCompatibility JavaVersion.VERSION_1_7
+        //targetCompatibility JavaVersion.VERSION_1_7
+    //}
     productFlavors {
     }
     lintOptions {
         checkReleaseBuilds true
         abortOnError false
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
 }
 
@@ -35,11 +43,14 @@ dependencies {
 
     //picasso for handling images
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
     compile 'commons-io:commons-io:2.4'
 
+
+
     //android design library for material design
-    compile 'com.android.support:appcompat-v7:23.0.+'
-    compile 'com.android.support:design:23.0.+'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.android.support:design:22.2.1'
 
     //greenrobot for event bus
     compile 'de.greenrobot:eventbus:2.4.0'
@@ -57,6 +68,24 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0'
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
+    //aviary for image editing
+    compile 'com.adobe.creativesdk.foundation:auth:0.7.329'
+    compile 'com.adobe.creativesdk:image:4.0.0'
+
+    //jdeferred
+    compile 'org.jdeferred:jdeferred-android-aar:1.2.3'
+
+    //leak canary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3.1'
+
+    //UILoader
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+
     testCompile 'junit:junit:4.12'
     testCompile "org.robolectric:robolectric:3.0"
+
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.powermock:powermock-mockito-release-full:1.5.4'
+
 }

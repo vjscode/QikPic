@@ -131,4 +131,10 @@ public class QikPicListFragment extends Fragment implements ActivityInteraction,
         mListView.setOnItemClickListener(new ListViewItemClickListener(getActivity()));
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //RefWatcher refWatcher = QikPicApplication.getRefWatcher(getActivity());
+        //refWatcher.watch(this);
+    }
 }

@@ -87,4 +87,10 @@ public class QikPicGridFragment extends Fragment implements LoaderManager.Loader
         cusrsorAdapter.swapCursor(null);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //RefWatcher refWatcher = QikPicApplication.getRefWatcher(getActivity());
+        //refWatcher.watch(this);
+    }
 }

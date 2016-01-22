@@ -26,9 +26,12 @@ public class DownloadTask extends AsyncTask<Integer, Void, Void> {
 
     @Inject Context context;
     ScrollListener listener;
-    public DownloadTask(ScrollListener listener) {
-        this.listener = listener;
+    public DownloadTask() {
         QikPicApplication.getAppContextComponent().inject(this);
+    }
+
+    public void setScrollListener(ScrollListener listener) {
+        this.listener = listener;
     }
 
     public void fetch(int skip) {

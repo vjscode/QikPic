@@ -102,9 +102,6 @@ public class QikPikContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        /**
-         * Add a new student record
-         */
         long rowID = 0;
         try {
             rowID = db.insertOrThrow(QIKPIC_TABLE_NAME, "", values);

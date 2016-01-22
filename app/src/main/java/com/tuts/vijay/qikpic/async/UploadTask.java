@@ -61,7 +61,11 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
                     List<ParseObject> list = pq.find();
                     if (list.size() > 0) {
                         ParseObject row = list.get(0);
+                        ParseFile[] imgFile = createParseFilesFromFile(c.getString(c.getColumnIndex("image")),
+                                c.getString(c.getColumnIndex("thumbnail")), c.getString(c.getColumnIndex("userId")));
                         row.put("tags", loadTags(c.getString(c.getColumnIndex("tags"))));
+                        row.put("image", imgFile[0]);
+                        row.put("thumbnail", imgFile[1]);
                         row.save();
                     }
                 } catch (ParseException e) {
@@ -84,6 +88,38 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
 
     private void makeParseObject(String objectId, String qikpicId, String image, String userId, String createdAt,
                                  String updateAt, String tags, String thumbnail, String lat, String lng) {
+
+            ParseFile[] imageFiles = createParseFilesFromFile(image, thumbnail, userId);
+
+            //thumbnailPFile.save();
+            ParseUser pu = ParseUser.getCurrentUser();
+            final ParseObject po = new ParseObject("QikPik");
+            if (objectId != null) {
+                po.put("objectId", objectId);
+            }
+            po.put("qikpicId", qikpicId);
+            po.put("image", imageFiles[0]);
+
+            po.put("user", pu);
+            po.put("created", Long.valueOf(createdAt));
+            po.put("updated", Long.valueOf(updateAt));
+            po.put("tags", loadTags(tags));
+            po.put("thumbnail", imageFiles[1]);
+            if (lat != null && lng != null) {
+                po.put("lat", lat);
+                po.put("lng", lng);
+            }
+            po.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    updateLocal(po.getObjectId(), po.getString("qikpicId"));
+
+                }
+            });
+    }
+
+    private ParseFile[] createParseFilesFromFile(String image, String thumbnail, String userId) {
+        ParseFile[] result = new ParseFile[2];
         try {
             //read image file
             File imageFile = new File(image);
@@ -97,34 +133,15 @@ public class UploadTask extends AsyncTask<Void, Void, Void> {
             fis = new FileInputStream(thumbnailFile);
             byte[] thumbnailBytes = IOUtils.toByteArray(fis);
             ParseFile thumbnailPFile = new ParseFile("thumbnail_" + userId + ".jpg", thumbnailBytes);
-            //thumbnailPFile.save();
-            ParseUser pu = ParseUser.getCurrentUser();
-            final ParseObject po = new ParseObject("QikPik");
-            if (objectId != null) {
-                po.put("objectId", objectId);
-            }
-            po.put("qikpicId", qikpicId);
-            po.put("image", imgPFile);
 
-            po.put("user", pu);
-            po.put("created", Long.valueOf(createdAt));
-            po.put("updated", Long.valueOf(updateAt));
-            po.put("tags", loadTags(tags));
-            po.put("thumbnail", thumbnailPFile);
-            if (lat != null && lng != null) {
-                po.put("lat", lat);
-                po.put("lng", lng);
-            }
-            po.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    updateLocal(po.getObjectId(), po.getString("qikpicId"));
 
-                }
-            });
-        } catch (IOException ioe) {
+            result[0] = imgPFile;
+            result[1] = thumbnailPFile;
+        }  catch (IOException ioe) {
             ioe.printStackTrace();
         }
+
+        return result;
     }
 
     private void updateParseObject(ParseObject po) {

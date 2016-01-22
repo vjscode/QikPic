@@ -156,7 +156,7 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
             showTags = true;
             setTagViews();
             addTagView(tag);
-            ((DetailActivity)getActivity()).addTagToList(tag);
+            ((DetailActivity)getActivity()).updateTags(tag);
         }
     }
 

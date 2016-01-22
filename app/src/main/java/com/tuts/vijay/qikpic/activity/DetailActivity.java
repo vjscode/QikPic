@@ -2,7 +2,9 @@ package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -13,8 +15,10 @@ import android.location.Location;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -29,6 +33,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.aviary.android.feather.sdk.AviaryIntent;
+import com.aviary.android.feather.sdk.internal.filters.ToolLoaderFactory;
+import com.aviary.android.feather.sdk.internal.headless.utils.MegaPixels;
+import com.nostra13.universalimageloader.cache.memory.MemoryCache;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -40,12 +49,17 @@ import com.tuts.vijay.qikpic.fragment.QikPicTagsFragment;
 import com.tuts.vijay.qikpic.listener.TagListener;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
+import org.jdeferred.DoneCallback;
+import org.jdeferred.android.AndroidDeferredManager;
+import org.jdeferred.android.DeferredAsyncTask;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -57,6 +71,7 @@ import java.util.Map;
 public class DetailActivity extends Activity implements View.OnClickListener, TagListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
+    private static final int IMAGE_EDIT_CODE = 1;
     private String oldOrNew;
     private ImageView imageView;
     private FlowLayout tagPanel;
@@ -77,6 +92,10 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private Location mCurrentLocation;
     private boolean fromCamera = false;
     private String picturePathInGallery;
+    private ToolLoaderFactory.Tools[] tools = {ToolLoaderFactory.Tools.DRAW, ToolLoaderFactory.Tools.ORIENTATION,
+            ToolLoaderFactory.Tools.CROP, ToolLoaderFactory.Tools.LIGHTING};
+    private boolean needsImgSave = false;
+    private boolean needsImgReSave = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +117,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             loadImage();
         } else {
             isPicNew = true;
+            needsImgSave = true;
             uri = getIntent().getParcelableExtra("uri");
             Log.d("test", "uri:>> " + uri);
             timeStampForFileName = getIntent().getStringExtra("thumbnailname");
@@ -234,15 +254,34 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         switch (item.getItemId()) {
             case R.id.action_save:
                 if (isPicNew) {
-                    createThumbnail();
+                    //createThumbnail(timeStampForFileName);
+                    asyncCreateThumbnail(timeStampForFileName);
                 } else {
-                    saveQikPik();
+                    asyncSave();
                 }
+                break;
+            case R.id.action_edit:
+                showAviaryScreen();
                 break;
             case R.id.action_tag:
                 createAndShowTagDialog();
         }
         return true;
+    }
+
+    private void showAviaryScreen() {
+        final DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics( metrics );
+        int max_size = Math.max( metrics.widthPixels, metrics.heightPixels );
+        //max_size = (int) ( (float) max_size / 1.2f );
+        Intent imageEditorIntent = new AviaryIntent.Builder(this)
+                .setData(uri)
+                .withOutputFormat(Bitmap.CompressFormat.JPEG)
+                .withOutputSize(MegaPixels.Mp5)
+                .withPreviewSize(max_size)
+                .withToolList(tools)
+                .build();
+        startActivityForResult(imageEditorIntent, 1);
     }
 
     private void createAndShowTagDialog() {
@@ -253,33 +292,114 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         dialogFragment.show(ft, "Tag Fragment");
     }
 
-    private void createThumbnail() {
+    private void asyncCreateThumbnail(final String fileName) {
+        final ProgressDialog dialog = new ProgressDialog(DetailActivity.this);
+        dialog.setMessage(getString(R.string.saving));
+        dialog.show();
+        AndroidDeferredManager dm = new AndroidDeferredManager();
+        dm.when(new DeferredAsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackgroundSafe(Void... params) throws Exception {
+                Log.d("test", "doinbkg 1");
+                if (needsImgSave) {
+                    Log.d("test", "doinbkg 2");
+                    createThumbnail(fileName);
+                }
+                return true;
+            }
+        }).done(new DoneCallback<Boolean>() {
+            @Override
+            public void onDone(Boolean result) {
+                Log.d("test", "doinbkg 3");
+                dialog.dismiss();
+                finish();
+            }
+        });
+    }
+
+    private void asyncSave() {
+        final ProgressDialog dialog = new ProgressDialog(DetailActivity.this);
+        dialog.setMessage(getString(R.string.saving));
+        dialog.show();
+        if (needsImgSave || needsSave) {
+            new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    saveQikPik();
+                    return true;
+                }
+
+                @Override
+                protected void onPostExecute(Boolean param) {
+                    super.onPostExecute(param);
+                    dialog.dismiss();
+                    finish();
+                }
+            }.execute();
+        } else {
+            dialog.dismiss();
+            finish();
+        }
+    }
+
+    private void createThumbnail(String fileName) {
         Bitmap actuallyUsableBitmap = null;
-        if (qikpicBmp == null) {
+        if (qikpicBmp == null || needsImgReSave) {
+            Log.d("test", "createThumbnail: " + qikpicBmp + ", " + needsImgReSave);
             setBitmapFromUri();
         }
         actuallyUsableBitmap = qikpicBmp;
-        Bitmap thumbnailImage = ThumbnailUtils.extractThumbnail(actuallyUsableBitmap, actuallyUsableBitmap.getWidth()/2, actuallyUsableBitmap.getHeight()/2);
+        Bitmap thumbnailImage = ThumbnailUtils.extractThumbnail(actuallyUsableBitmap, actuallyUsableBitmap.getWidth()/6, actuallyUsableBitmap.getHeight()/6);
         createDirIfNotPresent();
         FileOutputStream fOut = null;
+        String parseObjectId = null;
+        if (!isPicNew) {
+            parseObjectId = getParseObjectId(fileName);
+            if (parseObjectId != null && !parseObjectId.equals("")) {
+                fileName = parseObjectId;
+            }
+        }
         try {
             //save full file
-            fOut = new FileOutputStream(getFilesDir() + "/full/full_" + timeStampForFileName + ".jpg");
-            qikpicBmp.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut = new FileOutputStream(getFilesDir() + "/full/full_" + fileName + ".jpg");
+            qikpicBmp.compress(Bitmap.CompressFormat.JPEG, 25, fOut);
             fOut.flush();
             fOut.close();
             //save thumbnail file
-            fOut = new FileOutputStream(getFilesDir() + "/thumbnail/thumbnail_" + timeStampForFileName + ".jpg");
-            thumbnailImage.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut = new FileOutputStream(getFilesDir() + "/thumbnail/thumbnail_" + fileName + ".jpg");
+            thumbnailImage.compress(Bitmap.CompressFormat.PNG, 50, fOut);
             fOut.flush();
             fOut.close();
-            saveToDB();
-            removeFileFromDisk();
-            finish();
+            invalidateMemoryCache(fileName);
+            //invalidateDiskCache(thumbCacheKey, fullCacheKey);
+            if (isPicNew) {
+                saveToDB();
+                removeFileFromDisk();
+            } else if (needsImgReSave) {
+                removeFileFromDisk();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException ioe) {
             ioe.printStackTrace();
+        }
+    }
+
+    private String getParseObjectId(String fileName) {
+        Cursor c = getContentResolver().query(QikPikContentProvider.CONTENT_URI,
+                new String[]{"objectId", "image", "thumbnail"}, "qikpicId=?", new String[]{fileName}, null);
+        c.moveToFirst();
+        String image = c.getString(c.getColumnIndex("image"));
+        return image.substring(image.indexOf("full_") + 5, image.indexOf(".jpg"));
+    }
+
+    private void invalidateMemoryCache(String fileName) {
+        MemoryCache cache = ImageLoader.getInstance().getMemoryCache();
+        Collection<String> keys = cache.keys();
+        for (String key : keys) {
+            if (key.contains(fileName)) {
+                cache.remove(key);
+            }
         }
     }
 
@@ -352,7 +472,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     }
 
     private void loadImageFromBitmap(Bitmap bmp) {
-        needsSave = true;
+        //needsSave = true;
         imageView.setImageBitmap(bmp);
         setProgressBarIndeterminateVisibility(false);
     }
@@ -369,7 +489,8 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
                 new String[]{"image", "tags", "createdAt", "lat", "lng"}, "qikpicId=?", new String[]{oldOrNew}, null);
         c.moveToFirst();
         String imgFile = c.getString(c.getColumnIndex("image"));
-        imageView.setImageURI(Uri.parse(imgFile));
+        uri = Uri.parse(imgFile);
+        imageView.setImageURI(uri);
         prettyTimeStamp.setText(getDisplayableTime(Long.parseLong(c.getString(c.getColumnIndex("createdAt")))));
         //load tags into list
         String tagStr = c.getString(c.getColumnIndex("tags"));
@@ -424,7 +545,11 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             tempTagList = new ArrayList<String>();
         }
         tempTagList.add(tag);
+    }
+
+    public void updateTags(String tag) {
         needsSave = true;
+        addTagToList(tag);
     }
 
     @Override
@@ -432,15 +557,16 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         if (savingInProgress) {
             return;
         }
-        if (!needsSave) {
+        if (!needsSave && !needsImgSave) {
             super.onBackPressed();
             return;
         }
         if (isPicNew) {
             //createQikPik();
-            createThumbnail();
+            //createThumbnail(timeStampForFileName);
+            asyncCreateThumbnail(timeStampForFileName);
         } else {
-            saveQikPik();
+            asyncSave();
         }
     }
 
@@ -448,11 +574,14 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         ContentValues values = new ContentValues();
         values.put("tags", getTagListAsString());
         values.put("draft", 1);
+        if (needsImgSave) {
+            createThumbnail(oldOrNew);
+        }
         //update db table with id..(Uri uri, ContentValues values, String selection, String[] selectionArgs)
         int count = getContentResolver().update(QikPikContentProvider.CONTENT_URI,
                 values, "qikpicId=?", new String[]{oldOrNew});
         Log.d("test", "count of updated records: " + count);
-        finish();
+
     }
     private Bitmap adjustImageOrientation(Bitmap image) {
         ExifInterface exif;
@@ -502,7 +631,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
                     getContentResolver().openAssetFileDescriptor(uri, "r");
 
             int widthPixels = DisplayUtils.getWidth(this);
-            int heightPixels = DisplayUtils.getHeight(this) / 2;
+            int heightPixels = DisplayUtils.getHeight(this);
 
             float targetW = widthPixels;
             float targetH = heightPixels;
@@ -520,7 +649,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             Log.d("test", "SCALE: " + scale);
 
             // Determine how much to scale down the image
-            scaleFactor = (int) Math.ceil((double) scale) * 2;
+            scaleFactor = (int) Math.ceil((double) scale);
 
             // Decode the image file into a Bitmap sized to fill the View
             bmOptions.inJustDecodeBounds = false;
@@ -530,7 +659,11 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
                     = BitmapFactory.decodeFileDescriptor(
                     fileDescriptor.getFileDescriptor(), null, bmOptions);
 
-            qikpicBmp =  adjustImageOrientation(actuallyUsableBitmap);
+            if (isPicNew) {
+                qikpicBmp = adjustImageOrientation(actuallyUsableBitmap);
+            } else {
+                qikpicBmp = actuallyUsableBitmap;
+            }
             return qikpicBmp;
         } catch (IOException io) {
             return null;
@@ -538,10 +671,10 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     }
 
     private void removeFileFromDisk() {
-        if (fromCamera) {
+        if (fromCamera || needsImgReSave) {
             Log.d(TAG, "deleted? " + new File(uri.getPath()).delete());
         } else {
-            Log.d(TAG, "delete? " + getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            Log.d(TAG, "delete.? " + getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     MediaStore.Images.ImageColumns.DATA + "=?" , new String[]{ picturePathInGallery }));
         }
     }
@@ -549,6 +682,26 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (qikpicBmp != null) {
+            qikpicBmp.recycle();
+            qikpicBmp = null;
+        }
+        //RefWatcher refWatcher = QikPicApplication.getRefWatcher(this);
+        //refWatcher.watch(this);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case IMAGE_EDIT_CODE:
+                    needsImgSave = true;
+                    needsImgReSave = true;
+                    uri = data.getData().buildUpon().scheme("file").build();
+                    Log.d("test", "uurrii: " + uri);
+                    imageView.setImageURI(uri);
+                    break;
+            }
+        }
+    }
 }
