@@ -123,7 +123,9 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             timeStampForFileName = getIntent().getStringExtra("thumbnailname");
             Log.d("test", "timeStampForFileName:>> " + timeStampForFileName);
             Bitmap bmp = setBitmapFromUri();
-            loadImageFromBitmap(bmp);
+            if (bmp != null) {
+                loadImageFromBitmap(bmp);
+            }
             mCurrentLocation = getIntent().getParcelableExtra("location");
         }
         imageView.setOnTouchListener(new View.OnTouchListener() {
