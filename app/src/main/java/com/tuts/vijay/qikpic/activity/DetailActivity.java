@@ -289,7 +289,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private void createAndShowTagDialog() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.tag_dialog_in, R.anim.tag_dialog_out);
-        QikPicTagsFragment dialogFragment = new QikPicTagsFragment (this, mCurrentLocation);
+        QikPicTagsFragment dialogFragment = new QikPicTagsFragment (mCurrentLocation);
         ((QikPicTagsFragment)dialogFragment).setTags(tempTagList);
         dialogFragment.show(ft, "Tag Fragment");
     }

@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
 import com.tuts.vijay.qikpic.activity.DetailActivity;
-import com.tuts.vijay.qikpic.listener.TagListener;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.util.List;
@@ -37,7 +36,6 @@ import java.util.List;
 public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCallback {
 
     private List<String> tags;
-    private TagListener tagListener;
     private FlowLayout taggingPanel;
     private TextView addTag;
     private QikPicMapFragment mapFragment;
@@ -52,8 +50,7 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
         mapFragment = new QikPicMapFragment();
     }
 
-    public QikPicTagsFragment(TagListener tagListener, Location location) {
-        this.tagListener = tagListener;
+    public QikPicTagsFragment(Location location) {
         this.mLocation = location;
         createMap();
     }

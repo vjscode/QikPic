@@ -2,6 +2,7 @@ package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.view.MenuItem;
@@ -9,9 +10,11 @@ import android.view.MenuItem;
 import com.tuts.vijay.qikpic.BuildConfig;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.application.TestQikPicApplication;
+import com.tuts.vijay.qikpic.fragment.QikPicTagsFragment;
 
 import junit.framework.Assert;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -19,7 +22,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.fakes.RoboMenuItem;
+import org.robolectric.util.FragmentTestUtil;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.robolectric.Shadows.shadowOf;
 
 /**
@@ -48,5 +53,12 @@ public class DetailActivityTest {
         i.putExtra("thumbnailname", 999);
         i.putExtra("location", (Parcelable) null);
         return i;
+    }
+
+    @Test
+    public void launchTagsFragment() throws Exception {
+        final QikPicTagsFragment fragment = new QikPicTagsFragment(new Location("service Provider"));
+        FragmentTestUtil.startFragment(fragment);
+        assertThat(fragment.getView(), CoreMatchers.not(CoreMatchers.nullValue()));
     }
 }
