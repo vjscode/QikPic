@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><resources>
+
+    <string name="app_name">QikPic</string>
+    <string name="action_logout">Déconnexion</string>
+    <string name="login">Connexion</string>
+    <string name="prompt_password">mot de passe qikpic</string>
+    <string name="prompt_username">e-mail</string>
+    <string name="error_blank_username">nom d\'utilisateur non renseigné</string>
+    <string name="error_valid_email">veuillez saisir une adresse e-mail valide</string>
+    <string name="error_blank_password">mot de passe non renseigné</string>
+    <string name="progress_login">progress login</string>
+    <string name="signup">Inscription</string>
+    <string name="prompt_password_again">mot de passe qikpic</string>
+    <string name="progress_signup">progress sign up</string>
+    <string name="error_mismatched_passwords">les mots de passe ne correspondent pas</string>
+    <string name="caption">QikPic</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="search_hint">étiquette</string>
+    <string name="menu_search">recherche</string>
+    <string name="qikpik_name_count">QikPics</string>
+    <string name="active_pane">ACTIVE_PANE</string>
+    <string name="active_pane_default">0</string>
+    <string name="no_qikpics">Il n\'y a aucune note QikPic pour le moment</string>
+    <string name="action_tag">Étiquette</string>
+
+</resources>
