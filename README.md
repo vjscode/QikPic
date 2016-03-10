@@ -28,3 +28,10 @@ When you take photos of your meeting whiteboards, grocery lists, receipts, parki
   - Add pic from Gallery to QikPic feature
   - Expanding floating actions
   - Integrate Google account picker
+
+# Version 3.0
+  - Support photo notes editing. You can draw colorful markers on top of your notes, crop them, rotate in all angles, adjust brightness, contrast to your qikpics
+  - Handle Android M permission system
+  - Out of memory fix
+  - Add dagger for dependency injection
+  - More unit tests
