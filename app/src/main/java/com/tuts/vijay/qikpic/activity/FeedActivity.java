@@ -1,5 +1,6 @@
 package com.tuts.vijay.qikpic.activity;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.PendingIntent;
@@ -51,6 +52,7 @@ import com.tuts.vijay.qikpic.event.MediaStorePicEvent;
 import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
 import com.tuts.vijay.qikpic.listener.GMSConnectionListener;
+import com.tuts.vijay.qikpic.permission.PermissionManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -216,10 +218,24 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
                 fabVisibility(View.GONE);
             }
         } else if (view.getId() == R.id.fabCamera) {
-            startCamera();
+            if (PermissionManager.checkAndAskPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                startCamera();
+            } else {
+                Toast.makeText(this, "Please give QikPic WRITE_EXTERNAL_STORAGE",
+                        Toast.LENGTH_LONG).show();
+                PermissionManager.askPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        PermissionManager.QIKPIC_PERMISSIONS_REQUEST_STORAGE);
+            }
             fabVisibility(View.GONE);
         } else if (view.getId() == R.id.fabGallery) {
-            dispatchPickPictureIntent();
+            if (PermissionManager.checkAndAskPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                dispatchPickPictureIntent();
+            } else {
+                Toast.makeText(this, "Please give QikPic WRITE_EXTERNAL_STORAGE",
+                        Toast.LENGTH_LONG).show();
+                PermissionManager.askPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        PermissionManager.QIKPIC_PERMISSIONS_REQUEST_STORAGE);
+            }
             fabVisibility(View.GONE);
         }
     }

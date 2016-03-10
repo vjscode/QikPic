@@ -1,5 +1,7 @@
 package com.tuts.vijay.qikpic.fragment;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -17,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,6 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
 import com.tuts.vijay.qikpic.activity.DetailActivity;
+import com.tuts.vijay.qikpic.permission.PermissionManager;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
 import java.util.List;
@@ -50,6 +54,7 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
         mapFragment = new QikPicMapFragment();
     }
 
+    @SuppressLint("ValidFragment")
     public QikPicTagsFragment(Location location) {
         this.mLocation = location;
         createMap();
@@ -78,7 +83,14 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.add(R.id.mapContainer, mapFragment);
         ft.commit();
-        mapFragment.getMapAsync(this);
+        if (PermissionManager.checkAndAskPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+            mapFragment.getMapAsync(this);
+        } else {
+            Toast.makeText(getActivity(), "Please give QikPic ACCESS_FINE_LOCATION",
+                    Toast.LENGTH_LONG).show();
+            PermissionManager.askPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    PermissionManager.QIKPIC_PERMISSIONS_REQUEST_LOCATION);
+        }
 
         return rootView;
     }
@@ -175,6 +187,14 @@ public class QikPicTagsFragment extends DialogFragment implements OnMapReadyCall
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             googleMap.addMarker(new MarkerOptions()
                     .position(latLng));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionManager.QIKPIC_PERMISSIONS_REQUEST_LOCATION) {
+            mapFragment.getMapAsync(this);
         }
     }
 }

@@ -23,7 +23,7 @@
     <string name="active_pane_default">0</string>
     <string name="no_qikpics">No QikPics Yet</string>
     <string name="action_tag">Tag</string>
-    <string name="saving">Save in progress</string>
-    <string name="action_edit">Edit</string>
+    <string name="saving" translatable="false">Save in progress</string>
+    <string name="action_edit" translatable="false">Edit</string>
 
 </resources>

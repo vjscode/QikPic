@@ -1,15 +1,16 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '23.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId 'com.tuts.vijay.qikpic'
         minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 4
-        versionName '2.1'
+        targetSdkVersion 23
+        versionCode 5
+        versionName '3.0'
     }
     buildTypes {
         release {
@@ -18,10 +19,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    //compileOptions {
-      //  sourceCompatibility JavaVersion.VERSION_1_7
-        //targetCompatibility JavaVersion.VERSION_1_7
-    //}
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     productFlavors {
     }
     lintOptions {
@@ -30,7 +31,14 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/DEPENDENCIES'
+        pickFirst 'AndroidManifest.xml'
+    }
+    dexOptions {
+        jumboMode = true
     }
 }
 
@@ -41,16 +49,11 @@ dependencies {
     compile files('libs/Parse-1.9.2/Parse-1.9.2.jar')
     compile files('libs/Parse-1.9.2/bolts-android-1.2.0.jar')
 
-    //picasso for handling images
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
     compile 'commons-io:commons-io:2.4'
 
-
-
     //android design library for material design
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:design:22.2.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
 
     //greenrobot for event bus
     compile 'de.greenrobot:eventbus:2.4.0'
@@ -69,7 +72,7 @@ dependencies {
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
     //aviary for image editing
-    compile 'com.adobe.creativesdk.foundation:auth:0.7.329'
+    compile 'com.adobe.creativesdk.foundation:auth:0.9.7'
     compile 'com.adobe.creativesdk:image:4.0.0'
 
     //jdeferred

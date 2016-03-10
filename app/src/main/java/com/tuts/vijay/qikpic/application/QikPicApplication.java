@@ -1,7 +1,6 @@
 package com.tuts.vijay.qikpic.application;
 
 import com.adobe.creativesdk.foundation.AdobeCSDKFoundation;
-import com.adobe.creativesdk.foundation.internal.auth.AdobeAuthIMSEnvironment;
 import com.flurry.android.FlurryAgent;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -21,8 +20,8 @@ public class QikPicApplication extends android.app.Application implements com.av
     private static final String PARSE_APP_ID = "7Iax9O5yMbDA28MSwr3IV0BjgbUC29sY5I8Ygir0";
     private static final String PARSE_CLIENT_KEY = "Awk0EA8r9oN9dRZAMTWJ1mJvy8cBoqAfweDIeuG1";
 
-    private static final String CREATIVE_SDK_CLIENT_ID = "d61263b966ce4ddc81341e0574a1d1bd";
-    private static final String CREATIVE_SDK_CLIENT_SECRET = "5e120d0c-b7f0-4036-80bb-d5011f01b2af";
+    private static final String CREATIVE_SDK_CLIENT_ID = "";
+    private static final String CREATIVE_SDK_CLIENT_SECRET = "";
 
     private static QikPicComponent qikPicComponent;
     protected static TaskComponent taskComponent;
@@ -56,10 +55,7 @@ public class QikPicApplication extends android.app.Application implements com.av
     }
 
     private void initializeCreativeSDK() {
-        AdobeCSDKFoundation.initializeCSDKFoundation(
-                getApplicationContext(),
-                AdobeAuthIMSEnvironment.AdobeAuthIMSEnvironmentProductionUS
-        );
+        AdobeCSDKFoundation.initializeCSDKFoundation(getApplicationContext());
     }
 
     private void initializeFlurry() {
