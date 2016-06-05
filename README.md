@@ -1,3 +1,5 @@
+![Logo](https://lh3.googleusercontent.com/VIf6y4Pe8v3r0cVwpR0F3IbxdbcC-GNGmAZ580FfE-sAp3I1Q_u_f3ouPV_cZwFHhjo=w300-rw)
+
 # QikPic
 
 When you take photos of your meeting whiteboards, grocery lists, receipts, parking spots, dresses and shoes to buy and other things you only need in the short term, they remain in your gallery along with other important cherishable photos. They also occupy disk space. You might even have to regulary delete these pics inorder to make room for your new app or other photos. Qikpic aims to solve the above problems. When you use this app to take those photos you need in the short term, they will not show up in the gallery. Qikpic will automatically remove the photos from your disk when you are not using the app and bring them back to the app from the cloud when you access the app. 
