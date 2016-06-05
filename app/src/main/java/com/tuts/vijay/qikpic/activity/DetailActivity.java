@@ -7,6 +7,8 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -44,6 +46,8 @@ import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.R;
 import com.tuts.vijay.qikpic.Utils.Constants;
 import com.tuts.vijay.qikpic.Utils.DisplayUtils;
+import com.tuts.vijay.qikpic.databinding.ActivityListItemDetailBinding;
+import com.tuts.vijay.qikpic.databinding.QikPicDetail;
 import com.tuts.vijay.qikpic.db.QikPikContentProvider;
 import com.tuts.vijay.qikpic.fragment.QikPicTagsFragment;
 import com.tuts.vijay.qikpic.listener.TagListener;
@@ -95,15 +99,16 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             ToolLoaderFactory.Tools.CROP, ToolLoaderFactory.Tools.LIGHTING};
     private boolean needsImgSave = false;
     private boolean needsImgReSave = false;
+    private ActivityListItemDetailBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActionBar().setBackgroundDrawable(new ColorDrawable(0x1A90BDC2));
-        setContentView(R.layout.activity_list_item_detail);
-        imageView = (ImageView) findViewById(R.id.imageDetail);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_list_item_detail);
+        imageView = binding.imageDetail;
         tagPanel = (FlowLayout) findViewById(R.id.taggingPanel);
-        prettyTimeStamp = (TextView) findViewById(R.id.prettyTimeStamp);
+        prettyTimeStamp = binding.prettyTimeStamp;
         oldOrNew = getIntent().getStringExtra("oldOrNew");
         fromCamera = getIntent().getBooleanExtra("fromCamera", false);
         if (!fromCamera) {
@@ -466,12 +471,19 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         c.moveToFirst();
         String imgFile = c.getString(c.getColumnIndex("image"));
         uri = Uri.parse(imgFile);
-        imageView.setImageURI(uri);
-        prettyTimeStamp.setText(getDisplayableTime(Long.parseLong(c.getString(c.getColumnIndex("createdAt")))));
+        QikPicDetail detail = new QikPicDetail(getDisplayableTime(Long.parseLong(c.getString(c.getColumnIndex("createdAt")))), uri);
+        binding.setDetailts(
+                detail
+        );
         //load tags into list
         String tagStr = c.getString(c.getColumnIndex("tags"));
         loadTags(tagStr);
         loadLocation(c.getString(c.getColumnIndex("lat")), c.getString(c.getColumnIndex("lng")));
+    }
+
+    @BindingAdapter({"bind:imageUrl"})
+    public static void setImageUrl(ImageView view, String imageUrl) {
+        ImageLoader.getInstance().displayImage("file://" + imageUrl, view);
     }
 
     private void loadLocation(String lat, String lng) {

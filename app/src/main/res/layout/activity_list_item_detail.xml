@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="detailts" type="com.tuts.vijay.qikpic.databinding.QikPicDetail"/>
+    </data>
+<RelativeLayout
     android:layout_height="match_parent"
     android:layout_margin="0dp"
     android:layout_width="match_parent"
@@ -14,15 +19,18 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:padding="0dp"
+        bind:imageUrl="@{detailts.uriStr}"
         android:scaleType="fitCenter" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/prettyTimeStamp"
+        android:text="@{detailts.ts}"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_margin="10dp"
         android:textColor="#FFFFFF"/>
 
 </RelativeLayout>
+</layout>

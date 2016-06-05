@@ -5,17 +5,17 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.databinding.ActivitySignUpBinding;
 
 /**
  * Activity which displays a login screen to the user.
@@ -23,37 +23,19 @@ import com.tuts.vijay.qikpic.R;
 public class SignUpActivity extends Activity {
     private static final int REQUEST_CODE_EMAIL = 1;
     private static final String TAG = SignUpActivity.class.getSimpleName();;
-    // UI references.
-    private EditText usernameEditText;
-    private EditText passwordEditText;
-    private EditText passwordAgainEditText;
+    // UI binding
+    private ActivitySignUpBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_sign_up);
-
-        // Set up the signup form.
-        usernameEditText = (EditText) findViewById(R.id.username_edit_text);
-
-        passwordEditText = (EditText) findViewById(R.id.password_edit_text);
-        passwordAgainEditText = (EditText) findViewById(R.id.password_again_edit_text);
-        passwordAgainEditText.setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == R.id.edittext_action_signup ||
-                        actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
-                    signup();
-                    return true;
-                }
-                return false;
-            });
-
-        // Set up the submit button click handler
-        Button mActionButton = (Button) findViewById(R.id.action_button);
-        mActionButton.setOnClickListener((view) -> {
-                signup();
-        });
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         populateEmailIfPossible();
+    }
+
+    public void onClickSignUp(View v) {
+        signup();
     }
 
     private void populateEmailIfPossible() {
@@ -67,9 +49,9 @@ public class SignUpActivity extends Activity {
     }
 
     private void signup() {
-        String username = usernameEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
-        String passwordAgain = passwordAgainEditText.getText().toString().trim();
+        String username = binding.usernameEditText.getText().toString().trim();
+        String password = binding.passwordEditText.getText().toString().trim();
+        String passwordAgain = binding.passwordAgainEditText.getText().toString().trim();
 
         // Validate the sign up data
         boolean validationError = false;
@@ -126,7 +108,7 @@ public class SignUpActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_EMAIL && resultCode == RESULT_OK) {
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            usernameEditText.setText(accountName);
+            binding.usernameEditText.setText(accountName);
         }
     }
 }
