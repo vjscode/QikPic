@@ -40,6 +40,9 @@ android {
     dexOptions {
         jumboMode = true
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {

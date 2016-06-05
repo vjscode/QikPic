@@ -3,33 +3,31 @@ package com.tuts.vijay.qikpic.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.R;
+import com.tuts.vijay.qikpic.databinding.ActivityLoginBinding;
 
 /**
  * Activity which displays a login screen to the user, offering registration as well.
  */
 public class LoginActivity extends Activity {
     // UI references.
-    private EditText usernameEditText;
-    private EditText passwordEditText;
+    private ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_login);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
 
         // Set up the login form.
-        usernameEditText = (EditText) findViewById(R.id.username);
-        passwordEditText = (EditText) findViewById(R.id.password);
-        passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
+        binding.password.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == R.id.edittext_action_login ||
                         actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                     login();
@@ -46,8 +44,8 @@ public class LoginActivity extends Activity {
     }
 
     private void login() {
-        String username = usernameEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
+        String username = binding.username.getText().toString().trim();
+        String password = binding.password.getText().toString().trim();
 
         // Validate the log in data
         boolean validationError = false;
