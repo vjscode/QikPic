@@ -28,7 +28,7 @@ public class QikPicListFragment extends Fragment implements ActivityInteraction,
     private ListView mListView;
     private QikPicCursorAdapter cusrsorAdapter;
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
-    QikPikContentProvider dataProvider;
+    private QikPikContentProvider dataProvider;
 
     private static final String[] PROJECTION = new String[] { "_id", "objectId", "image", "thumbnail", "createdAt",
         "updatedAt", "qikpicId"};

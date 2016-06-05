@@ -24,5 +24,4 @@ public class DispatchActivity extends Activity {
             startActivity(new Intent(this, NewUserActivity.class));
         }
     }
-
 }

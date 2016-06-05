@@ -7,19 +7,14 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
-import com.parse.ParseException;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 import com.tuts.vijay.qikpic.R;
 
 /**
@@ -44,24 +39,19 @@ public class SignUpActivity extends Activity {
 
         passwordEditText = (EditText) findViewById(R.id.password_edit_text);
         passwordAgainEditText = (EditText) findViewById(R.id.password_again_edit_text);
-        passwordAgainEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        passwordAgainEditText.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == R.id.edittext_action_signup ||
                         actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                     signup();
                     return true;
                 }
                 return false;
-            }
-        });
+            });
 
         // Set up the submit button click handler
         Button mActionButton = (Button) findViewById(R.id.action_button);
-        mActionButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+        mActionButton.setOnClickListener((view) -> {
                 signup();
-            }
         });
         populateEmailIfPossible();
     }
@@ -119,9 +109,7 @@ public class SignUpActivity extends Activity {
         user.setEmail(username);
 
         // Call the Parse signup method
-        user.signUpInBackground(new SignUpCallback() {
-            @Override
-            public void done(ParseException e) {
+        user.signUpInBackground((e) -> {
                 dialog.dismiss();
                 if (e != null) {
                     // Show the error message
@@ -131,9 +119,7 @@ public class SignUpActivity extends Activity {
                     Intent intent = new Intent(SignUpActivity.this, DispatchActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                }
-            }
-        });
+                }});
     }
 
     @Override

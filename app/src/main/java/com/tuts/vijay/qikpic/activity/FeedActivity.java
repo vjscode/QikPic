@@ -34,9 +34,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.parse.CountCallback;
-import com.parse.LogOutCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -49,7 +46,6 @@ import com.tuts.vijay.qikpic.async.LoadPicFromMediaStoreTask;
 import com.tuts.vijay.qikpic.async.UploadTask;
 import com.tuts.vijay.qikpic.event.LocationEvent;
 import com.tuts.vijay.qikpic.event.MediaStorePicEvent;
-import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 import com.tuts.vijay.qikpic.fragment.QikPicListFragment;
 import com.tuts.vijay.qikpic.listener.GMSConnectionListener;
 import com.tuts.vijay.qikpic.permission.PermissionManager;
@@ -78,10 +74,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView listIcon;
     private FloatingActionButton anchorFab;
 
-    //Fragments
-    QikPicGridFragment gridFragment;
-    QikPicListFragment listFragment;
-    Fragment currentFragment;
+    private Fragment currentFragment;
 
     //UI
     TextView txtQikPikCount;
@@ -102,7 +95,6 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         initUI();
-        initFragment();
         startResizeTimer();
     }
 
@@ -153,24 +145,6 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
         //runQikPikCountQuery();
     }
 
-    private void initFragment() {
-        /*FragmentManager fm = getFragmentManager();
-
-        int activePane = readActivePane();
-        FragmentTransaction ft = fm.beginTransaction();
-        if (activePane == Constants.CONTAINER_GRID) {
-            gridFragment = new QikPicGridFragment();
-            ft.add(R.id.fragmentContainer, gridFragment);
-            ft.commit();
-            currentFragment = gridFragment;
-        } else {
-            listFragment = new QikPicListFragment();//PhotosListFragment();
-            ft.add(R.id.fragmentContainer, listFragment);
-            ft.commit();
-            currentFragment = listFragment;
-        }*/
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -200,12 +174,9 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void performLogOut() {
-        ParseUser.logOutInBackground(new LogOutCallback() {
-            @Override
-            public void done(ParseException e) {
+        ParseUser.logOutInBackground((e) -> {
                 startActivity(new Intent(FeedActivity.this, NewUserActivity.class));
                 FeedActivity.this.finish();
-            }
         });
     }
 
@@ -311,7 +282,7 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     private void startActivityForTagging(boolean fromCamera, String picturePath) {
         Intent i = new Intent(this, DetailActivity.class);
         i.putExtra("oldOrNew", "new");
-        Log.d("test", "feed uri:>> " + mCurrentTimeStamp);
+        Log.d(TAG, "feed uri: " + mCurrentTimeStamp);
         i.putExtra("uri", mCurrentPhotoUri);
         i.putExtra("thumbnailname", mCurrentTimeStamp);
         i.putExtra("location", mLastLocation);
@@ -328,14 +299,12 @@ public class FeedActivity extends AppCompatActivity implements View.OnClickListe
     private void runQikPikCountQuery() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("QikPik");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
-        query.countInBackground(new CountCallback() {
-            public void done(int count, ParseException e) {
+        query.countInBackground((count, e) -> {
                 if (e == null) {
                     txtQikPikCount.setText(count + "");
                 } else {
-                    // The request failed
+                    Log.d(TAG, "Count query failed");
                 }
-            }
         });
     }
 

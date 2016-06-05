@@ -1,21 +1,14 @@
 package com.tuts.vijay.qikpic.activity;
 
 import android.app.Activity;
-import android.os.Bundle;
-
-
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.view.KeyEvent;
-import android.view.View;
+import android.os.Bundle;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.LogInCallback;
-import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.R;
 
@@ -36,24 +29,19 @@ public class LoginActivity extends Activity {
         // Set up the login form.
         usernameEditText = (EditText) findViewById(R.id.username);
         passwordEditText = (EditText) findViewById(R.id.password);
-        passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == R.id.edittext_action_login ||
                         actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
                     login();
                     return true;
                 }
                 return false;
-            }
         });
 
         // Set up the submit button click handler
         Button actionButton = (Button) findViewById(R.id.action_button);
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+        actionButton.setOnClickListener((view) -> {
                 login();
-            }
         });
     }
 
@@ -85,9 +73,7 @@ public class LoginActivity extends Activity {
         dialog.setMessage(getString(R.string.progress_login));
         dialog.show();
         // Call the Parse login method
-        ParseUser.logInInBackground(username, password, new LogInCallback() {
-            @Override
-            public void done(ParseUser user, ParseException e) {
+        ParseUser.logInInBackground(username, password, (user, e) -> {
                 dialog.dismiss();
                 if (e != null) {
                     // Show the error message
@@ -98,7 +84,6 @@ public class LoginActivity extends Activity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
-            }
         });
     }
 }

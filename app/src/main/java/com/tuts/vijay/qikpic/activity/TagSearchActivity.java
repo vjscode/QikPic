@@ -12,7 +12,7 @@ import com.tuts.vijay.qikpic.fragment.QikPicGridFragment;
 
 public class TagSearchActivity extends AppCompatActivity {
 
-    QikPicGridFragment gridFragment;
+    private QikPicGridFragment gridFragment;
     private String searchTag;
 
     @Override

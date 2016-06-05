@@ -49,7 +49,6 @@ import com.tuts.vijay.qikpic.fragment.QikPicTagsFragment;
 import com.tuts.vijay.qikpic.listener.TagListener;
 import com.tuts.vijay.qikpic.view.FlowLayout;
 
-import org.jdeferred.DoneCallback;
 import org.jdeferred.android.AndroidDeferredManager;
 import org.jdeferred.android.DeferredAsyncTask;
 
@@ -128,13 +127,10 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             }
             mCurrentLocation = getIntent().getParcelableExtra("location");
         }
-        imageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+        imageView.setOnTouchListener((view, motionEvent) -> {
                 gestureDetector.onTouchEvent(motionEvent);
                 mScaleDetector.onTouchEvent(motionEvent);
                 return true;
-            }
         });
         initScaleGestureDetector();
     }
@@ -144,6 +140,9 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         addTagToList(tag);
     }
 
+    /**
+     * Gesture listener that handles pinch to zoom on qikpics
+     */
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
@@ -181,26 +180,6 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             }
             return true;
         }
-
-        /*@Override
-        public boolean onDoubleTap(MotionEvent e) {
-            if (mScrollable == false) {
-                imageView.setScaleX(2.0f);
-                imageView.setScaleY(2.0f);
-                mScrollable = true;
-                scrollView.setScrollable(false);
-            } else {
-                imageView.setScaleX(1.0f);
-                imageView.setScaleY(1.0f);
-                imageView.setScrollX(0);
-                imageView.setScrollY(0);
-                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                mScrollable = false;
-                scrollView.setScrollable(true);
-            }
-            //mScrollable = scrollMode;
-            return super.onDoubleTap(e);
-        }*/
     }
 
     private void initScaleGestureDetector() {
@@ -256,7 +235,6 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         switch (item.getItemId()) {
             case R.id.action_save:
                 if (isPicNew) {
-                    //createThumbnail(timeStampForFileName);
                     asyncCreateThumbnail(timeStampForFileName);
                 } else {
                     asyncSave();
@@ -275,7 +253,6 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         final DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics( metrics );
         int max_size = Math.max( metrics.widthPixels, metrics.heightPixels );
-        //max_size = (int) ( (float) max_size / 1.2f );
         Intent imageEditorIntent = new AviaryIntent.Builder(this)
                 .setData(uri)
                 .withOutputFormat(Bitmap.CompressFormat.JPEG)
@@ -302,21 +279,18 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         dm.when(new DeferredAsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackgroundSafe(Void... params) throws Exception {
-                Log.d("test", "doinbkg 1");
+                Log.d(TAG, "createthumbnail started");
                 if (needsImgSave) {
-                    Log.d("test", "doinbkg 2");
+                    Log.d(TAG, "createthumbnail saving");
                     createThumbnail(fileName);
                 }
                 return true;
             }
-        }).done(new DoneCallback<Boolean>() {
-            @Override
-            public void onDone(Boolean result) {
+        }).done((result) -> {
                 Log.d("test", "doinbkg 3");
                 dialog.dismiss();
                 finish();
-            }
-        });
+            });
     }
 
     private void asyncSave() {
@@ -347,7 +321,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
     private void createThumbnail(String fileName) {
         Bitmap actuallyUsableBitmap = null;
         if (qikpicBmp == null || needsImgReSave) {
-            Log.d("test", "createThumbnail: " + qikpicBmp + ", " + needsImgReSave);
+            Log.d(TAG, "createThumbnail: " + qikpicBmp + ", " + needsImgReSave);
             setBitmapFromUri();
         }
         actuallyUsableBitmap = qikpicBmp;
@@ -564,8 +538,6 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
             return;
         }
         if (isPicNew) {
-            //createQikPik();
-            //createThumbnail(timeStampForFileName);
             asyncCreateThumbnail(timeStampForFileName);
         } else {
             asyncSave();
@@ -585,6 +557,8 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
         Log.d("test", "count of updated records: " + count);
 
     }
+
+    //Fix the weird Samsung camera issue. Images are rotated 90 degrees
     private Bitmap adjustImageOrientation(Bitmap image) {
         ExifInterface exif;
         try {
@@ -648,7 +622,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
 
             float scale = Math.max(photoW / targetW, photoH / targetH);
 
-            Log.d("test", "SCALE: " + scale);
+            Log.d(TAG, "SCALE: " + scale);
 
             // Determine how much to scale down the image
             scaleFactor = (int) Math.ceil((double) scale);
@@ -700,7 +674,7 @@ public class DetailActivity extends Activity implements View.OnClickListener, Ta
                     needsImgSave = true;
                     needsImgReSave = true;
                     uri = data.getData().buildUpon().scheme("file").build();
-                    Log.d("test", "uurrii: " + uri);
+                    Log.d(TAG, "uri of edited image: " + uri);
                     imageView.setImageURI(uri);
                     break;
             }
