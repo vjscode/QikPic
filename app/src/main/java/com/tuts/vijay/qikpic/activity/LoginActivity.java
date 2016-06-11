@@ -11,20 +11,20 @@ import android.widget.Toast;
 
 import com.parse.ParseUser;
 import com.tuts.vijay.qikpic.R;
-import com.tuts.vijay.qikpic.databinding.ActivityLoginBinding;
+import com.tuts.vijay.qikpic.databinding.ActivityLoginConstraintsBinding;
 
 /**
  * Activity which displays a login screen to the user, offering registration as well.
  */
 public class LoginActivity extends Activity {
     // UI references.
-    private ActivityLoginBinding binding;
+    private ActivityLoginConstraintsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login_constraints);
 
         // Set up the login form.
         binding.password.setOnEditorActionListener((v, actionId, event) -> {
